@@ -1,0 +1,16 @@
+{
+    "name": "jpry/advent-of-code",
+    "description": "Solutions to adventofcode.com.",
+    "authors": [
+        {
+            "name": "Jeremy Pry",
+            "email": "jeremy.pry@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "JPry\\AdventOfCode\\": "src/"
+        }
+    }
+}
