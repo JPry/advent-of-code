@@ -26,7 +26,7 @@
  * What is the sum of each row's result in your puzzle input?
  */
 
-namespace JPry\AdventOfCode\y2017\day2;
+namespace JPry\AdventOfCode\y2017\day02;
 
 /**
  * Find the 2 numbers in each row that are evenly divisible, and return their sum.

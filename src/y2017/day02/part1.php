@@ -21,7 +21,7 @@
  * In this example, the spreadsheet's checksum would be 8 + 4 + 6 = 18.
  */
 
-namespace JPry\AdventOfCode\y2017\day2;
+namespace JPry\AdventOfCode\y2017\day02;
 
 /**
  * Find the difference between largest and smallest values in each row of a spreadsheet.
