@@ -53,7 +53,6 @@ function compute($value): int
     $column    = 0;
     $lastValue = 1;
     $direction = 'right';
-    $position  = 2;
     $ring      = 1;
     $a         = [
         [1],
@@ -100,6 +99,7 @@ function compute($value): int
                     $column    = 0;
                     $direction = 'down';
                 }
+
                 break;
 
             case 'down':
@@ -110,30 +110,28 @@ function compute($value): int
                     $a[]       = array_fill(0, $ring, 0);
                     $direction = 'right';
                 }
+
                 break;
         }
 
         // Check surrounding positions.
-        $newValue = 0;
-        $newValue += isset($a[$row + 0][$column + 1]) ? $a[$row + 0][$column + 1] : 0;
-        $newValue += isset($a[$row + 0][$column - 1]) ? $a[$row + 0][$column - 1] : 0;
-        $newValue += isset($a[$row + 1][$column + 0]) ? $a[$row + 1][$column + 0] : 0;
-        $newValue += isset($a[$row - 1][$column + 0]) ? $a[$row - 1][$column + 0] : 0;
-        $newValue += isset($a[$row + 1][$column + 1]) ? $a[$row + 1][$column + 1] : 0;
-        $newValue += isset($a[$row + 1][$column - 1]) ? $a[$row + 1][$column - 1] : 0;
-        $newValue += isset($a[$row - 1][$column + 1]) ? $a[$row - 1][$column + 1] : 0;
-        $newValue += isset($a[$row - 1][$column - 1]) ? $a[$row - 1][$column - 1] : 0;
+        $lastValue = 0;
+        $lastValue += isset($a[$row + 0][$column + 1]) ? $a[$row + 0][$column + 1] : 0;
+        $lastValue += isset($a[$row + 0][$column - 1]) ? $a[$row + 0][$column - 1] : 0;
+        $lastValue += isset($a[$row + 1][$column + 0]) ? $a[$row + 1][$column + 0] : 0;
+        $lastValue += isset($a[$row - 1][$column + 0]) ? $a[$row - 1][$column + 0] : 0;
+        $lastValue += isset($a[$row + 1][$column + 1]) ? $a[$row + 1][$column + 1] : 0;
+        $lastValue += isset($a[$row + 1][$column - 1]) ? $a[$row + 1][$column - 1] : 0;
+        $lastValue += isset($a[$row - 1][$column + 1]) ? $a[$row - 1][$column + 1] : 0;
+        $lastValue += isset($a[$row - 1][$column - 1]) ? $a[$row - 1][$column - 1] : 0;
 
         // Store the new value in the current location.
-        $a[$row][$column] = $lastValue = $newValue;
-
-        // Increment position.
-        $position++;
+        $a[$row][$column] = $lastValue;
     }
 
     return $lastValue;
 }
 
-echo 'last value 363: ' . compute(363) . PHP_EOL;
-echo 'last value 750: ' . compute(750) . PHP_EOL;
+//echo 'last value 363: ' . compute(363) . PHP_EOL;
+//echo 'last value 750: ' . compute(750) . PHP_EOL;
 echo 'input value: ' . compute(INPUT) . PHP_EOL;
