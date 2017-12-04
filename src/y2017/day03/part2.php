@@ -42,11 +42,6 @@ define('INPUT', 265149);
  * 43  44  45  46  47  48  49
  */
 
-function square($value): int
-{
-    return $value ** 2;
-}
-
 function compute($value): int
 {
     $row       = 0;
