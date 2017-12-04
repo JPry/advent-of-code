@@ -111,14 +111,14 @@ function compute($value): int
 
         // Check surrounding positions.
         $lastValue = 0;
-        $lastValue += isset($a[$row + 0][$column + 1]) ? $a[$row + 0][$column + 1] : 0;
-        $lastValue += isset($a[$row + 0][$column - 1]) ? $a[$row + 0][$column - 1] : 0;
-        $lastValue += isset($a[$row + 1][$column + 0]) ? $a[$row + 1][$column + 0] : 0;
-        $lastValue += isset($a[$row - 1][$column + 0]) ? $a[$row - 1][$column + 0] : 0;
-        $lastValue += isset($a[$row + 1][$column + 1]) ? $a[$row + 1][$column + 1] : 0;
-        $lastValue += isset($a[$row + 1][$column - 1]) ? $a[$row + 1][$column - 1] : 0;
-        $lastValue += isset($a[$row - 1][$column + 1]) ? $a[$row - 1][$column + 1] : 0;
-        $lastValue += isset($a[$row - 1][$column - 1]) ? $a[$row - 1][$column - 1] : 0;
+        $lastValue += $a[$row + 0][$column + 1] ?? 0;
+        $lastValue += $a[$row + 0][$column - 1] ?? 0;
+        $lastValue += $a[$row + 1][$column + 0] ?? 0;
+        $lastValue += $a[$row - 1][$column + 0] ?? 0;
+        $lastValue += $a[$row + 1][$column + 1] ?? 0;
+        $lastValue += $a[$row + 1][$column - 1] ?? 0;
+        $lastValue += $a[$row - 1][$column + 1] ?? 0;
+        $lastValue += $a[$row - 1][$column - 1] ?? 0;
 
         // Store the new value in the current location.
         $a[$row][$column] = $lastValue;
