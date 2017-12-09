@@ -97,7 +97,7 @@ $test7 = '{{<!!>},{<!!>},{<!!>},{<!!>}}';
 $test8 = '{{<a!>},{<a!>},{<a!>},{<ab>}}';
 $input = trim(file_get_contents(__DIR__ . '/input.txt'));
 
-foreach (range(1,8) as $num) {
+foreach (range(1, 8) as $num) {
     echo "test{$num} score: " . sumGroups(${"test{$num}"}) . PHP_EOL;
 }
 
