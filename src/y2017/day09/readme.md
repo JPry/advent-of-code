@@ -1,4 +1,4 @@
-# Advent of Code, Day 8: Stream Processing
+# Advent of Code, Day 9: Stream Processing
 
 http://adventofcode.com/2017/day/9.
 
