@@ -82,20 +82,20 @@ function buildTree(array &$data): array
 
     // Build the tree.
     $tree = [
-        $top => recurseChildren($data, $top),
+        $top => buildChildren($data, $top),
     ];
 
     return $tree;
 }
 
 
-function recurseChildren(array &$data, string $parent): array
+function buildChildren(array &$data, string $parent): array
 {
     $return             = $data[$parent];
     $return['children'] = [];
 
     foreach ($data[$parent]['children'] as $child) {
-        $return['children'][$child] = recurseChildren($data, $child);
+        $return['children'][$child] = buildChildren($data, $child);
     }
 
     $childrenWeight        = array_column($return['children'], 'totalWeight');
@@ -104,9 +104,31 @@ function recurseChildren(array &$data, string $parent): array
     return $return;
 }
 
-function findUnbalanced(array &$data): string
+function findUnbalanced(array $data, string $parent)
 {
-    $tree = buildTree(buildRelationships($data));
+    $childWeights    = array_column($data[$parent]['children'], 'totalWeight', 'name');
+    $childRawWeights = array_column($data[$parent]['children'], 'weight', 'name');
+    $counts          = array_count_values($childWeights);
+    $oneUnbalanced   = array_search(1, $counts);
+
+    if (false === $oneUnbalanced) {
+        return false;
+    }
+
+    $unbalanced = array_search(
+        $oneUnbalanced,
+        $childWeights
+    );
+
+    $unbalancedChild = findUnbalanced($data[$parent]['children'], $unbalanced);
+
+    // Print the total weights of each child, and the raw weights of each child.
+    if (false === $unbalancedChild) {
+        print_r($childWeights);
+        print_r($childRawWeights);
+    }
+
+    return false === $unbalancedChild ? $unbalanced : $unbalancedChild;
 }
 
 $test1 = <<< TEST
@@ -124,11 +146,15 @@ ugml (68) -> gyxo, ebii, jptl
 gyxo (61)
 cntj (57)
 TEST;
-$input = trim(file_get_contents(__DIR__ . '/input.txt'));
 
-$testTree = buildTree(buildRelationships(parseData($test1)));
-//$inputTree = buildTree(buildRelationships(parseData($input)));
+$testParsed = buildRelationships(parseData($test1));
+$testTop    = getTop($testParsed);
+$testTree   = buildTree($testParsed);
 
-echo 'Test unbalanced: ' . findUnbalanced(parseData($test1)). PHP_EOL;
+$input       = trim(file_get_contents(__DIR__ . '/input.txt'));
+$inputParsed = buildRelationships(parseData($input));
+$inputTop    = getTop($inputParsed);
+$inputTree   = buildTree($inputParsed);
 
-
+echo 'test unbalanced: ' . findUnbalanced($testTree, $testTop) . PHP_EOL;
+echo 'input unbalanced: ' . findUnbalanced($inputTree, $inputTop) . PHP_EOL;
