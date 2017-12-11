@@ -17,9 +17,10 @@
  * To achieve this, begin with a list of numbers from 0 to 255, a current position which begins at 0 (the first element
  * in the list), a skip size (which starts at 0), and a sequence of lengths (your puzzle input). Then, for each length:
  *
- * Reverse the order of that length of elements in the list, starting with the element at the current position.
- * Move the current position forward by that length plus the skip size.
- * Increase the skip size by one.
+ * - Reverse the order of that length of elements in the list, starting with the element at the current position.
+ * - Move the current position forward by that length plus the skip size.
+ * - Increase the skip size by one.
+ *
  * The list is circular; if the current position and the length try to reverse elements beyond the end of the list, the
  * operation reverses using as many extra elements as it needs from the front of the list. If the current position
  * moves past the end of the list, it wraps around to the front. Lengths larger than the size of the list are invalid.
@@ -55,8 +56,48 @@
 
 namespace JPry\AdventOfCode\y2017\day10;
 
+function tieTheKnot(array $list, array $lengths): array
+{
+    $skipSize        = 0;
+    $currentPosition = 0;
+    $listLength      = count($list);
+
+    foreach ($lengths as $length) {
+        // Get elements needing reversed.
+        $piece = array_slice($list, $currentPosition, $length, true);
+        if (count($piece) < $length) {
+            $more = array_slice($list, 0, $length - count($piece), true);
+            foreach ($more as $key => $value) {
+                $piece[$key] = $value;
+            }
+        }
+
+        $indexes = array_keys($piece);
+        $new     = array_combine($indexes, array_reverse($piece));
+        foreach ($new as $key => $value) {
+            $list[$key] = $value;
+        }
+
+        $currentPosition += $length + $skipSize;
+        if ($currentPosition >= $listLength) {
+            $currentPosition -= $listLength;
+        }
+
+        $skipSize++;
+    }
+
+    return $list;
+}
+
+function productFirstTwo(array $list): int
+{
+    return array_shift($list) * array_shift($list);
+}
 
 $testList    = range(0, 4);
 $testLengths = [3, 4, 1, 5];
 $list        = range(0, 255);
 $lengths     = explode(',', trim(file_get_contents(__DIR__ . '/input.txt')));
+
+echo 'Test product: ' . productFirstTwo(tieTheKnot($testList, $testLengths)) . PHP_EOL;
+echo 'Input product: ' . productFirstTwo(tieTheKnot($list, $lengths)) . PHP_EOL;
