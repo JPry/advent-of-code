@@ -69,7 +69,20 @@ function reduceSides(array $directions)
         return $index >= $length ? $index - $length : $index;
     };
 
-    foreach ($order as $index => $side) {
+    $compare = function($side, $compare, $index) use (&$directions, $next, $order) {
+        $result = $directions[$side] <=> $directions[$compare];
+        if ($result <= 0) {
+            $directions[$order[$next($index, 1)]] += $directions[$side];
+            $directions[$compare]                 -= $directions[$side];
+            $directions[$side]                    = 0;
+        } else {
+            $directions[$order[$next($index, 1)]] += $directions[$compare];
+            $directions[$side]                    -= $directions[$compare];
+            $directions[$compare]                 = 0;
+        }
+    };
+
+    foreach ($order as $index => &$side) {
         if (0 === $directions[$side]) {
             continue;
         }
@@ -77,36 +90,8 @@ function reduceSides(array $directions)
         $compare1 = $next($index, 2);
         $compare2 = $next($compare1, 2);
 
-
-    }
-
-    foreach ($order as $side) {
-        // Skip if there are no steps in the current direction.
-        if (!isset($directions[$side]) || !$directions[$side]) {
-            continue;
-        }
-
-        switch ($side) {
-            case 'sw':
-            case 'se':
-                if ($directions['se'] >= $directions['sw']) {
-                    $directions['s']  += $directions['sw'];
-                    $directions['sw'] = 0;
-                    $directions['se'] -= $directions['sw'];
-                } else {
-                    $directions['s']  += $directions['se'];
-                    $directions['se'] = 0;
-                    $directions['sw'] -= $directions['se'];
-                }
-
-                break;
-
-            case 'nw':
-            case 'ne':
-
-
-                break;
-        }
+        $compare($side, $order[$compare1], $index);
+        $compare($side, $order[$compare2], $index);
     }
 
     return $directions;
@@ -122,7 +107,7 @@ $counted = array_count_values($input);
 $reduced = reduceSides(reduceOpposites($counted));
 
 foreach (range(1, 4) as $i) {
-    echo "steps test{$i}: " . array_sum(
-            reduceSides(reduceOpposites(array_count_values(explode(',', ${"test{$i}"}))))
-        ) . PHP_EOL;
+    $testReduced = reduceSides(reduceOpposites(array_count_values(explode(',', ${"test{$i}"}))));
+    echo "steps test{$i}: " . array_sum($testReduced) . PHP_EOL;
 }
+echo "input steps: " . array_sum($reduced) . PHP_EOL;
