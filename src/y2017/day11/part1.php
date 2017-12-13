@@ -31,6 +31,16 @@
 
 namespace JPry\AdventOfCode\y2017\day11;
 
+/*
+ * Since we're trying to find the ending distance, we can cancel out any moves that are in opposite directions.
+ * Those moves have a net distance effect of 0. We will then be left with only the moves that continue to take
+ * use farther away.
+ *
+ * After the opposites are canceled, I think we should convert complementary moves. For example, 1 move SE
+ * followed by 1 move SW (2 steps) is the equivalent of 1 step S. Once all of the complementary moves are
+ * reduced, we should be left with something we can simple add.
+ */
+
 function reduceOpposites(array $directions)
 {
     $directions = array_merge(
@@ -102,6 +112,9 @@ $test2 = 'ne,ne,sw,sw';
 $test3 = 'ne,ne,s,s';
 $test4 = 'se,sw,se,sw,sw';
 
+/*
+ * How nice of them to give input that can be easily counted by simply using array_count_values()!
+ */
 $input   = explode(',', trim(file_get_contents(__DIR__ . '/input.txt')));
 $counted = array_count_values($input);
 $reduced = reduceSides(reduceOpposites($counted));
