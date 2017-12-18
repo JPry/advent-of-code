@@ -23,3 +23,5 @@
  * You watch the dance for a while and record their dance moves (your puzzle input). In what order are the programs
  * standing after their dance?
  */
+
+namespace JPry\AdventOfCode\y2017\day16;
