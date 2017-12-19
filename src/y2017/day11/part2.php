@@ -22,15 +22,60 @@ namespace JPry\AdventOfCode\y2017\day11;
  * can help there?
  */
 
-$test1 = 'ne,ne,ne';
-$test2 = 'ne,ne,sw,sw';
-$test3 = 'ne,ne,s,s';
-$test4 = 'se,sw,se,sw,sw';
+function furthestDistance(array $steps): int
+{
+    $furthest    = 0;
+    $coordinates = [0, 0, 0];
+    $getDistance = function(array $coordinates) {
+        if (0 !== array_sum($coordinates)) {
+            throw new \Exception('Invalid coordinates. Coordinates must add up to 0.');
+        }
 
-$input   = explode(',', trim(file_get_contents(__DIR__ . '/input.txt')));
+        return array_sum(array_map('abs', $coordinates)) / 2;
+    };
 
-//foreach (range(1, 4) as $i) {
-//    $testReduced = reduceSides(reduceOpposites(array_count_values(explode(',', ${"test{$i}"}))));
-//    echo "steps test{$i}: " . array_sum($testReduced) . PHP_EOL;
-//}
-//echo "input steps: " . array_sum($reduced) . PHP_EOL;
+    foreach ($steps as $step) {
+        switch ($step) {
+            case 'n':
+                $coordinates[1]++;
+                $coordinates[2]--;
+                break;
+            case 's':
+                $coordinates[1]--;
+                $coordinates[2]++;
+                break;
+            case 'ne':
+                $coordinates[0]++;
+                $coordinates[2]--;
+                break;
+            case 'sw':
+                $coordinates[0]--;
+                $coordinates[2]++;
+                break;
+            case 'nw':
+                $coordinates[0]--;
+                $coordinates[1]++;
+                break;
+            case 'se':
+                $coordinates[0]++;
+                $coordinates[1]--;
+                break;
+        }
+
+        $distance = $getDistance($coordinates);
+        $furthest = $distance > $furthest ? $distance : $furthest;
+    }
+
+    return $furthest;
+}
+
+$test1 = ['ne', 'ne', 'ne'];
+$test2 = ['ne', 'ne', 'sw', 'sw'];
+$test3 = ['ne', 'ne', 's', 's'];
+$test4 = ['se', 'sw', 'se', 'sw', 'sw'];
+$input = explode(',', trim(file_get_contents(__DIR__ . '/input.txt')));
+
+foreach (range(1, 4) as $item) {
+    echo "test{$item} furthest: " . furthestDistance(${"test{$item}"}) . PHP_EOL;
+}
+echo 'input furthest: ' . furthestDistance($input) . PHP_EOL;
