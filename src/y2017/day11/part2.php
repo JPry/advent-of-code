@@ -34,6 +34,12 @@ function furthestDistance(array $steps): int
         return array_sum(array_map('abs', $coordinates)) / 2;
     };
 
+    /*
+     * I was inspired for a hexagonal grid with this site: https://www.redblobgames.com/grids/hexagons/. This
+     * helped me visualize how to move, determine the number of steps, and also to ensure the coordinates
+     * are valid.
+     */
+
     foreach ($steps as $step) {
         switch ($step) {
             case 'n':
