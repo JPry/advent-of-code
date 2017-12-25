@@ -86,4 +86,6 @@ function convertHash(string $hash): string
     return $bin;
 }
 
-echo 'input count: ' . countUsed(INPUT) . PHP_EOL;
+if (__FILE__ === get_included_files()[0]) {
+    echo 'input count: ' . countUsed(INPUT) . PHP_EOL;
+}
