@@ -121,13 +121,15 @@ function getAscii(string $string): array
     return array_merge(array_map('ord', str_split($string)), [17, 31, 73, 47, 23]);
 }
 
-$lengths = trim(file_get_contents(__DIR__ . '/input.txt'));
-$test1   = '';
-$test2   = 'AoC 2017';
-$test3   = '1,2,3';
-$test4   = '1,2,4';
+if (__FILE__ === get_included_files()[0]) {
+    $lengths = trim(file_get_contents(__DIR__ . '/input.txt'));
+    $test1   = '';
+    $test2   = 'AoC 2017';
+    $test3   = '1,2,3';
+    $test4   = '1,2,4';
 
-foreach (range(1, 4) as $i) {
-    echo "test{$i} hash: " . tightenTheKnot(${"test{$i}"}) . PHP_EOL;
+    foreach (range(1, 4) as $i) {
+        echo "test{$i} hash: " . tightenTheKnot(${"test{$i}"}) . PHP_EOL;
+    }
+    echo 'input hash: ' . tightenTheKnot($lengths) . PHP_EOL;
 }
-echo 'input hash: ' . tightenTheKnot($lengths) . PHP_EOL;
