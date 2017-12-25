@@ -40,4 +40,50 @@
 
 namespace JPry\AdventOfCode\y2017\day14;
 
+/*
+ * This seems a bit tricky at first, but I like that I can reuse code from day 10!
+ */
+
+use JPry\AdventOfCode\y2017\day10;
+
+require_once dirname(__DIR__) . '/day10/part2.php';
+
 define('INPUT', 'hfdlxzhv');
+
+function countUsed(string $input): int
+{
+    $count = 0;
+
+    for ($i = 0; $i < 128; $i++) {
+        $hash = day10\tightenTheKnot("{$input}-{$i}");
+
+        // Strip zeros and count string length.
+        $noZeros = str_replace('0', '', convertHash($hash));
+        $count   += strlen($noZeros);
+    }
+
+    return $count;
+}
+
+/**
+ * Convert each piece into binary and concatenate.
+ *
+ * @author Jeremy Pry
+ *
+ * @param string $hash
+ *
+ * @return string
+ */
+function convertHash(string $hash): string
+{
+    $bin    = '';
+    $pieces = str_split($hash, 1);
+    foreach ($pieces as $piece) {
+        // Need to make sure to pad the string with zeros to get the proper length.
+        $bin .= str_pad(base_convert($piece, 16, 2), 4, '0', STR_PAD_LEFT);
+    }
+
+    return $bin;
+}
+
+echo 'input count: ' . countUsed(INPUT) . PHP_EOL;
