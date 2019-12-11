@@ -57,7 +57,7 @@ class Input
 			}
 
 			$info = pathinfo($file);
-			$this->files[$info['basename']] = $info;
+			$this->files[$info['filename']] = $info;
 		}
 	}
 }
