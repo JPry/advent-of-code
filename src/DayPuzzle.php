@@ -40,6 +40,12 @@ abstract class DayPuzzle
 		return $namespace;
 	}
 
+	protected function getHandleForFile(string $filename, string $mode = 'r')
+	{
+		$file = $this->input->getFile($filename);
+		return fopen("{$file['dirname']}/{$file['basename']}", $mode);
+	}
+
 	abstract protected function getNamespace();
 	abstract protected function part1();
 	abstract protected function part2();

@@ -72,10 +72,4 @@ class Solver extends DayPuzzle
 	{
 		return __NAMESPACE__;
 	}
-
-	protected function getHandleForFile(string $filename, string $mode = 'r')
-	{
-		$file = $this->input->getFile($filename);
-		return fopen("{$file['dirname']}/{$file['basename']}", $mode);
-	}
 }
