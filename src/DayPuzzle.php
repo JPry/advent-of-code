@@ -42,8 +42,13 @@ abstract class DayPuzzle
 
 	protected function getHandleForFile(string $filename, string $mode = 'r')
 	{
+		return fopen($this->getFilePath($filename), $mode);
+	}
+
+	protected function getFilePath(string $filename): string
+	{
 		$file = $this->input->getFile($filename);
-		return fopen("{$file['dirname']}/{$file['basename']}", $mode);
+		return "{$file['dirname']}/{$file['basename']}";
 	}
 
 	abstract protected function getNamespace();
