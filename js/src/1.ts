@@ -9,6 +9,12 @@ function reducer(a: number, value: number) {
     return Number(a) * Number(value)
 }
 
+function parseFile(file: string) {
+    return file.split('\n')
+        .filter((item: string) => item.length > 0)
+        .map(Number)
+}
+
 /**
  * --- Day 1: Report Repair ---
 
@@ -36,10 +42,11 @@ function reducer(a: number, value: number) {
 
  Of course, your expense report is much larger. Find the two entries that sum to 2020; what do you get if you multiply them together?
  *
- * @param data
+ * @param file
  * @param cmd
  */
-function runDay1(data: number[], cmd: Command) {
+function runDay1(file: string, cmd: Command) {
+    const data = parseFile(file)
     const small = data.filter((value: number) => value < 1000)
     const large = data.filter((value: number) => value >= 1000)
     const target: number = 2020
@@ -72,10 +79,11 @@ function runDay1(data: number[], cmd: Command) {
  Using the above example again, the three entries that sum to 2020 are 979, 366, and 675. Multiplying them together produces the answer, 241861950.
 
  In your expense report, what is the product of the three entries that sum to 2020?
- * @param data
+ * @param file
  * @param cmd
  */
-function runDay2(data: number[], cmd: Command) {
+function runDay2(file: string, cmd: Command) {
+    const data = parseFile(file)
     const target: number = 2020
     let foundNumbers = false
     let found: number[] = []

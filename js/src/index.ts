@@ -16,6 +16,10 @@ class Aoc extends Command {
         {name: 'day', required: true}
     ]
 
+    async delay(ms: number) {
+        return new Promise(res => setTimeout(res, ms));
+    }
+
     async run() {
         const {args, flags} = this.parse(Aoc)
         const test = flags.test ?? false
@@ -30,14 +34,11 @@ class Aoc extends Command {
         }
 
         cli.action.start('loading the file');
-        const data = fs.readFileSync(file)
-            .toString()
-            .split('\n')
-            .filter((item: string) => item.length > 0)
+        const data = fs.readFileSync(file).toString()
         cli.action.stop()
 
-        this.log(`Running for day ${day}. Test mode? ${test}`)
-        this.log(`File: ${relativeFile}`)
+        this.debug(`Running for day ${day}. Test mode? ${test}`)
+        this.debug(`File: ${relativeFile}`)
 
         const dayFunction = require(`./${day}`)
 
@@ -46,6 +47,7 @@ class Aoc extends Command {
         cli.action.stop()
 
         cli.action.start('Solving part 2')
+        await this.delay(2000)
         dayFunction.runDay2(data, this)
         cli.action.stop()
     }
