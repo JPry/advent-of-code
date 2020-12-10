@@ -1,0 +1,19 @@
+{
+  "name": "advent-of-code",
+  "version": "1.0.0",
+  "description": "JPry's Advent of Code",
+  "main": "js/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JPry/advent-of-code.git"
+  },
+  "author": "Jeremy Pry",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JPry/advent-of-code/issues"
+  },
+  "homepage": "https://github.com/JPry/advent-of-code#readme"
+}
