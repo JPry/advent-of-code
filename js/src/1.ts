@@ -45,7 +45,7 @@ function parseFile(file: string) {
  * @param file
  * @param cmd
  */
-function runDay1(file: string, cmd: Command) {
+function runPart1(file: string, cmd: Command) {
     const data = parseFile(file)
     const small = data.filter((value: number) => value < 1000)
     const large = data.filter((value: number) => value >= 1000)
@@ -82,7 +82,7 @@ function runDay1(file: string, cmd: Command) {
  * @param file
  * @param cmd
  */
-function runDay2(file: string, cmd: Command) {
+function runPart2(file: string, cmd: Command) {
     const data = parseFile(file)
     const target: number = 2020
     let foundNumbers = false
@@ -161,5 +161,5 @@ function runDay2(file: string, cmd: Command) {
 }
 
 
-exports.runDay1 = runDay1
-exports.runDay2 = runDay2
+exports.runPart1 = runPart1
+exports.runPart2 = runPart2

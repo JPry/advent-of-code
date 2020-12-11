@@ -44,7 +44,7 @@ function parseLine(line: string): PasswordRule {
  * @param file
  * @param cmd
  */
-function runDay1(file: string, cmd: Command) {
+function runPart1(file: string, cmd: Command) {
     const data: string[] = file.split('\n').filter((value: string) => value.length > 0)
     let validCount: number = 0;
     data.forEach((value: string) => {
@@ -82,7 +82,7 @@ function runDay1(file: string, cmd: Command) {
  * @param file
  * @param cmd
  */
-function runDay2(file: string, cmd: Command) {
+function runPart2(file: string, cmd: Command) {
     const data: string[] = file.split('\n').filter((value: string) => value.length > 0)
     let validCount: number = 0;
     data.forEach((value: string) => {
@@ -106,5 +106,5 @@ function runDay2(file: string, cmd: Command) {
 }
 
 
-exports.runDay1 = runDay1
-exports.runDay2 = runDay2
+exports.runPart1 = runPart1
+exports.runPart2 = runPart2

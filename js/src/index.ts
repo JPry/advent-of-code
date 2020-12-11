@@ -43,12 +43,12 @@ class Aoc extends Command {
         const dayFunction = require(`./${day}`)
 
         cli.action.start('Solving part 1')
-        dayFunction.runDay1(data, this)
+        dayFunction.runPart1(data, this)
         cli.action.stop()
 
         cli.action.start('Solving part 2')
         await this.delay(2000)
-        dayFunction.runDay2(data, this)
+        dayFunction.runPart2(data, this)
         cli.action.stop()
     }
 }
