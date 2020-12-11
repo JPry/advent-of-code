@@ -47,7 +47,6 @@ class Aoc extends Command {
         cli.action.stop()
 
         cli.action.start('Solving part 2')
-        await this.delay(2000)
         dayFunction.runPart2(data, this)
         cli.action.stop()
     }
