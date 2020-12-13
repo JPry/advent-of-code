@@ -1,7 +1,23 @@
 import Command from "@oclif/command";
 
 function parseFile(file: string) {
-    return file.split('\n\n').filter((value: string) => value.length > 0)
+    return file.split('\n').filter((value: string) => value.length > 0)
+}
+
+function stringToBinary(value: string, zero: string, one: string) {
+    return value.replace(new RegExp(zero, 'g'), '0').replace(new RegExp(one, 'g'), '1')
+}
+
+function getRowNumber(row: string) {
+    return parseInt(stringToBinary(row, 'F', 'B'), 2)
+}
+
+function getColumnNumber(column: string) {
+    return parseInt(stringToBinary(column, 'L', 'R'), 2)
+}
+
+function getId(row: number, column: number) {
+    return ((row * 8) + column)
 }
 
 /**
@@ -49,6 +65,17 @@ function parseFile(file: string) {
  */
 function runPart1(file: string, cmd: Command) {
     const rows: string[] = parseFile(file)
+    let maxId: number = 0;
+    rows.forEach((row: string) => {
+        const rowString = row.slice(0, 7)
+        const columnString = row.slice(-3)
+        const id = getId(getRowNumber(rowString), getColumnNumber(columnString))
+        if (id > maxId) {
+            maxId = id
+        }
+    })
+
+    cmd.log(`The max ID is ${maxId}`)
 }
 
 /**
@@ -59,6 +86,28 @@ function runPart1(file: string, cmd: Command) {
  */
 function runPart2(file: string, cmd: Command) {
     const rows: string[] = parseFile(file)
+    let ids: number[] = []
+    rows.forEach((row: string) => {
+        const rowString = row.slice(0, 7)
+        const columnString = row.slice(-3)
+        ids.push(getId(getRowNumber(rowString), getColumnNumber(columnString)))
+    })
+
+    const minId: number = ids.reduce((previousValue: number, currentValue: number) => {
+        return currentValue < previousValue ? currentValue : previousValue
+    })
+    const maxId: number = ids.reduce((previousValue: number, currentValue: number) => {
+        return currentValue > previousValue ? currentValue : previousValue
+    })
+
+    let emptySeats: number[] = []
+    for (let i: number = minId; i < maxId; i++) {
+        if (!ids.includes(i)) {
+            emptySeats.push(i)
+        }
+    }
+
+    cmd.log(`Empty seat(s): ${emptySeats.join(',')}`)
 }
 
 
