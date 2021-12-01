@@ -1,7 +1,7 @@
 <?php
 
 
-namespace JPry\AdventOfCode\y2019\template;
+namespace JPry\AdventOfCode\y2021\day01;
 
 use JPry\AdventOfCode\DayPuzzle;
 
@@ -9,6 +9,8 @@ class Solver extends DayPuzzle
 {
 	public function testData()
 	{
+		$handle = $this->getHandleForFile('test');
+
 	}
 
 	protected function part1()

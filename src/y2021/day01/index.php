@@ -4,7 +4,7 @@
 
 */
 
-namespace JPry\AdventOfCode\y2019\template;
+namespace JPry\AdventOfCode\y2021\day01;
 
 require_once dirname(__FILE__, 4) . '/vendor/autoload.php';
 

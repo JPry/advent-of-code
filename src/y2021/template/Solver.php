@@ -1,7 +1,7 @@
 <?php
 
 
-namespace JPry\AdventOfCode\y2019\template;
+namespace JPry\AdventOfCode\y2021\template;
 
 use JPry\AdventOfCode\DayPuzzle;
 
@@ -20,7 +20,7 @@ class Solver extends DayPuzzle
 	{
 	}
 
-	protected function getNamespace()
+	protected function getNamespace(): string
 	{
 		return __NAMESPACE__;
 	}
