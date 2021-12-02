@@ -11,6 +11,7 @@ class Solver extends DayPuzzle
 	{
 		$handle = $this->getHandleForFile('test');
 		$this->part1Logic($handle);
+		rewind($handle);
 		$this->part2Logic($handle);
 	}
 
