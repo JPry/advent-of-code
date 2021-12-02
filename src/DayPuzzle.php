@@ -36,8 +36,8 @@ abstract class DayPuzzle
 		$namespace = str_replace([__NAMESPACE__, '\\'], ['', '/'], $namespace);
 		$namespace = preg_replace('#/([^\d]+)?(\d+)#', '/$2', $namespace);
 		$namespace = ltrim($namespace, '/');
-		$namespace = str_replace('/', DIRECTORY_SEPARATOR, $namespace);
-		return $namespace;
+
+		return str_replace('/', DIRECTORY_SEPARATOR, $namespace);
 	}
 
 	protected function getHandleForFile(string $filename, string $mode = 'r')
@@ -51,7 +51,13 @@ abstract class DayPuzzle
 		return "{$file['dirname']}/{$file['basename']}";
 	}
 
+	public function runTests()
+	{
+	}
+
 	abstract protected function getNamespace();
+
 	abstract protected function part1();
+
 	abstract protected function part2();
 }
