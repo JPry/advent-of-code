@@ -1,0 +1,123 @@
+#!/usr/bin/env php
+<?php
+
+use JPry\AdventOfCode\DayPuzzle;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+
+require_once dirname(__DIR__) . '/vendor/autoload.php';
+
+trait Utils
+{
+	protected function normalizeDay(string $day): string
+	{
+		return sprintf('%1$02d', intval($day));
+	}
+
+	protected function getBaseNamespace(): string
+	{
+		return 'JPry\\AdventOfCode';
+	}
+}
+
+$app = new Application('Advent of Code', '1.0.0');
+
+$app->add(
+	new class() extends Command {
+		use Utils;
+
+		protected function configure()
+		{
+			$this
+				->setName('solve')
+				->setDescription('Solve a puzzle')
+				->addArgument(
+					'day',
+					InputArgument::REQUIRED,
+					'The day solver to run'
+				)
+				->addArgument(
+					'year',
+					InputArgument::OPTIONAL,
+					'The year solver to run.',
+					date('Y')
+				)
+				->addOption(
+					'test',
+					't',
+					InputOption::VALUE_NONE,
+					'Whether to run the test data'
+				);
+		}
+
+		protected function execute(InputInterface $input, OutputInterface $output): int
+		{
+			$day = $this->normalizeDay($input->getArgument('day'));
+			$year = $input->getArgument('year');
+			$doTests = $input->getOption('test');
+
+			$className = "{$this->getBaseNamespace()}\\y{$year}\\day{$day}\\Solver";
+
+			/** @var DayPuzzle $class */
+			$class = new $className();
+			$doTests ? $class->runTests() : $class->run();
+
+			return Command::SUCCESS;
+		}
+	}
+);
+
+$app->add(
+	new class() extends Command {
+		use Utils;
+
+		protected function configure()
+		{
+			$this
+				->setName('new')
+				->setDescription('Create a new test from the template')
+				->addArgument(
+					'day',
+					InputArgument::REQUIRED,
+					'The day solver to run'
+				)
+				->addArgument(
+					'year',
+					InputArgument::OPTIONAL,
+					'The year solver to run.',
+					date('Y')
+				);
+		}
+
+		protected function execute(InputInterface $input, OutputInterface $output): int
+		{
+			$day = $this->normalizeDay($input->getArgument('day'));
+			$year = $input->getArgument('year');
+
+			$baseDir = dirname(__DIR__);
+			$templatePath = "{$baseDir}/src/y{$year}/template";
+			$dayPath = "{$baseDir}/src/y{$year}/day{$day}";
+
+			if (!file_exists($dayPath)) {
+				mkdir($dayPath);
+			}
+
+			foreach (glob("{$templatePath}/*.php") as $file) {
+				$base = basename($file);
+				$contents = file_get_contents($file);
+				file_put_contents(
+					"{$dayPath}/{$base}",
+					str_replace('\\template', "\\day{$day}", $contents)
+				);
+			}
+
+			return Command::SUCCESS;
+		}
+	}
+);
+
+$app->run();
