@@ -97,8 +97,18 @@ $app->add(
 		{
 			$day = $this->normalizeDay($input->getArgument('day'));
 			$year = $input->getArgument('year');
-
 			$baseDir = dirname(__DIR__);
+
+			// Create the input files.
+			$inputBase = "{$baseDir}/input/{$year}/{$day}";
+			if (!file_exists($inputBase)) {
+				mkdir($inputBase);
+			}
+
+			touch("{$inputBase}/input.txt");
+			touch("{$inputBase}/test.txt");
+
+			// Create the solution files.
 			$templatePath = "{$baseDir}/src/y{$year}/template";
 			$dayPath = "{$baseDir}/src/y{$year}/day{$day}";
 
