@@ -40,30 +40,55 @@ class Solver extends DayPuzzle
 		printf("Product: %d\n", $gamma * $epsilon);
 	}
 
-	protected function part2Logic($input)
+	protected function part2Logic(string $input)
 	{
 		$rawData = $this->getRawData($input);
-		$digits = $this->getMostCommon($rawData);
+		$mostCommon = $this->getMostCommon($rawData);
+		$leastCommon = $this->getLeastCommon($rawData);
 		$columnIndex = 0;
 
+		// Find the most common items for Oxygen.
 		do {
-			$remaining = array_values(
+			$oxygenValue = array_values(
 				array_filter(
-					$remaining ?? $rawData,
-					function (array $value) use ($columnIndex, $digits) {
-						return intval($value[$columnIndex]) === intval($digits[$columnIndex]);
+					$oxygenValue ?? $rawData,
+					function (array $value) use ($columnIndex, $mostCommon) {
+						return intval($value[$columnIndex]) === intval($mostCommon[$columnIndex]);
 					}
 				)
 			);
-			$digits = $this->getMostCommon($remaining);
+			$mostCommon = $this->getMostCommon($oxygenValue);
 			$columnIndex++;
-		} while (1 < count($remaining));
+		} while (1 < count($oxygenValue));
 
-		$oxygen = bindec(join('', $remaining[0]));
+		// Find least common items for CO2.
+		$columnIndex = 0;
+		do {
+			$co2value = array_values(
+				array_filter(
+					$co2value ?? $rawData,
+					function (array $value) use ($columnIndex, $leastCommon) {
+						return intval($value[$columnIndex]) === intval($leastCommon[$columnIndex]);
+					}
+				)
+			);
+			$leastCommon = $this->getLeastCommon($co2value);
+			$columnIndex++;
+		} while (1 < count($co2value));
+
+		$oxygen = bindec(join('', $oxygenValue[0]));
 		printf(
-			"Oxygen: %b\n",
+			"Oxygen (binary): %1\$b\nOxygen: %1\$d\n",
 			$oxygen
 		);
+
+		$co2 = bindec(join('', $co2value[0]));
+		printf(
+			"CO2 (binary): %1\$b\nCO2: %1\$d\n",
+			$co2
+		);
+
+		printf("Product: %d\n", $oxygen * $co2);
 	}
 
 	protected function getNamespace(): string
@@ -77,14 +102,36 @@ class Solver extends DayPuzzle
 	 */
 	protected function getMostCommon(array $rawData): array
 	{
-		$mostCommon = [];
+		return $this->getCommon($rawData, 'most');
+	}
+
+	protected function getLeastCommon(array $rawData): array
+	{
+		return $this->getCommon($rawData, 'least');
+	}
+
+	protected function getCommon(array $rawData, string $comparator): array
+	{
+		$common = [];
 		foreach (range(0, count($rawData[0]) - 1) as $index) {
 			$column = array_column($rawData, $index);
 			$total = count($column);
 			$columnSum = array_sum($column);
-			$mostCommon[$index] = ($columnSum / $total) >= .5 ? 1 : 0;
+
+			switch ($comparator) {
+				case 'least':
+				case '<=':
+					$common[$index] = ($columnSum / $total) >= .5 ? 0 : 1;
+					break;
+
+				case 'most':
+				case '>=':
+					$common[$index] = ($columnSum / $total) >= .5 ? 1 : 0;
+					break;
+			}
 		}
-		return $mostCommon;
+
+		return $common;
 	}
 
 	/**
