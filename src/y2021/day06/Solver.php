@@ -25,14 +25,23 @@ class Solver extends DayPuzzle
 	protected function part1Logic(array $fishes)
 	{
 		$dayCount = 0;
-		$newFish = [];
 		do {
+			$newFish = 0;
 			foreach ($fishes as &$fish) {
-				if 
+				if (0 === $fish) {
+					$newFish++;
+					$fish = 6;
+					continue;
+				}
+
+				$fish--;
 			}
 
+			$fishes = array_merge($fishes, array_fill(0, $newFish, 8));
+
 			$dayCount++;
-		} while ($dayCount < 18);
+//			printf("After %d %s: %d\n", $dayCount, $dayCount > 1 ? 'days' : 'day', count($fishes));
+		} while ($dayCount < 80);
 
 		printf("There are %d fish!\n", count($fishes));
 	}
