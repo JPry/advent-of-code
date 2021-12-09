@@ -9,10 +9,9 @@ class Solver extends DayPuzzle
 {
 	public function runTests()
 	{
-		$handle = $this->getHandleForFile('test');
-		$this->part1Logic($handle);
-		rewind($handle);
-		$this->part2Logic($handle);
+		$testData = array_map('intval', explode(',', trim(file_get_contents($this->getFilePath('test')))));
+		$this->part1Logic($testData);
+		$this->part2Logic($testData);
 	}
 
 	protected function part1()
@@ -23,9 +22,19 @@ class Solver extends DayPuzzle
 	{
 	}
 
-	protected function part1Logic($input)
+	protected function part1Logic(array $fishes)
 	{
+		$dayCount = 0;
+		$newFish = [];
+		do {
+			foreach ($fishes as &$fish) {
+				if 
+			}
 
+			$dayCount++;
+		} while ($dayCount < 18);
+
+		printf("There are %d fish!\n", count($fishes));
 	}
 
 	protected function part2Logic($input)
