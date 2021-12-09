@@ -2,16 +2,41 @@
 
 namespace JPry\AdventOfCode\y2021\day05;
 
+use LogicException;
+
+/**
+ * @property Point start
+ * @property Point end
+ */
 class Line
 {
 	protected Point $start;
 	protected Point $end;
-	protected array $points;
+	protected array $points = [];
 
 	public function __construct(Point $start, Point $end)
 	{
 		$this->start = $start;
 		$this->end = $end;
+	}
+
+	public function __isset($name)
+	{
+		return $name === 'start' || $name === 'end';
+	}
+
+	public function __get($name)
+	{
+		switch ($name) {
+			case 'start':
+				return $this->start;
+
+			case 'end':
+				return $this->end;
+
+			default:
+				throw new LogicException('Invalid property');
+		}
 	}
 
 	/**
@@ -86,6 +111,18 @@ class Line
 
 	protected function generateDiagonalLine()
 	{
-		printf('Found values not in horizontal or vertical lines');
+		$xRange = range($this->start->x, $this->end->x);
+		$yRange = range($this->start->y, $this->end->y);
+
+		array_pop($xRange);
+		array_pop($yRange);
+		array_shift($xRange);
+		array_shift($yRange);
+
+		$this->points[] = $this->start;
+		foreach($xRange as $index => $x) {
+			$this->points[] = new Point($x, $yRange[$index]);
+		}
+		$this->points[] = $this->end;
 	}
 }

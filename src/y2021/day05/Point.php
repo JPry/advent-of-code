@@ -21,6 +21,11 @@ class Point
 		$this->y = $y;
 	}
 
+	public function __isset($name)
+	{
+		return $name === 'x' || $name === 'y';
+	}
+
 	public function __get($name)
 	{
 		switch ($name) {
