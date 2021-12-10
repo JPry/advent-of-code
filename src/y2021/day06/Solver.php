@@ -9,7 +9,7 @@ class Solver extends DayPuzzle
 {
 	public function runTests()
 	{
-		$testData = $this->convertInputToFish(file_get_contents($this->getFilePath('test')));
+		$testData = $this->convertInputToFish($this->getFileContents('test'));
 		$this->part1Logic($testData, 18);
 		$this->part2Logic($testData, 256);
 	}
@@ -17,7 +17,7 @@ class Solver extends DayPuzzle
 	protected function part1()
 	{
 		$this->part2Logic(
-			$this->convertInputToFish(file_get_contents($this->getFilePath('input'))),
+			$this->convertInputToFish($this->getFileContents()),
 			80
 		);
 	}
@@ -25,7 +25,7 @@ class Solver extends DayPuzzle
 	protected function part2()
 	{
 		$this->part2Logic(
-			$this->convertInputToFish(file_get_contents($this->getFilePath('input'))),
+			$this->convertInputToFish($this->getFileContents()),
 			256
 		);
 	}
@@ -82,7 +82,7 @@ class Solver extends DayPuzzle
 
 	protected function convertInputToFish(string $input): array
 	{
-		return array_map('intval', explode(',', trim($input)));
+		return $this->stringToNumbers($input);
 	}
 
 	protected function getNamespace(): string

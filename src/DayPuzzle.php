@@ -55,6 +55,16 @@ abstract class DayPuzzle
 	{
 	}
 
+	protected function getFileContents(string $fileName = 'input'): string
+	{
+		return trim(file_get_contents($this->getFilePath($fileName)));
+	}
+
+	protected function stringToNumbers(string $string): array
+	{
+		return array_map('intval', explode(',', trim($string)));
+	}
+
 	abstract protected function getNamespace();
 
 	abstract protected function part1();
