@@ -23,6 +23,7 @@ class Solver extends DayPuzzle
 
 	protected function part2()
 	{
+		$this->part2Logic($this->getHandleForFile('input'));
 	}
 
 	protected function part1Logic($input)
@@ -58,7 +59,45 @@ class Solver extends DayPuzzle
 
 	protected function part2Logic($input)
 	{
+		while ($line = fgets($input)) {
+			$line = trim($line);
+			if (empty($line)) {
+				continue;
+			}
 
+			[$patterns, $output] = explode(' | ', $line);
+			$patterns = explode(' ', $patterns);
+			$output = explode(' ', $output);
+
+			$result = $this->uncrossWires($patterns, $output);
+		}
+	}
+
+	protected function uncrossWires(array $patterns, array $output): array
+	{
+		$return = [
+			'a' => '',
+			'b' => '',
+			'c' => '',
+			'd' => '',
+			'e' => '',
+			'f' => '',
+			'g' => '',
+		];
+
+		$pieces = array_merge($patterns, $output);
+		usort(
+			$pieces,
+			function ($a, $b) {
+				$lengthA = strlen($a);
+				$lengthB = strlen($b);
+				return $lengthA === $lengthB
+					? 0
+					: ($lengthA < $lengthB ? -1 : 1);
+			}
+		);
+
+		return $return;
 	}
 
 	protected function getNamespace(): string
