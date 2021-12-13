@@ -85,7 +85,7 @@ class Solver extends DayPuzzle
 			'g' => '',
 		];
 
-		$pieces = array_merge($patterns, $output);
+		$pieces = $patterns;
 		usort(
 			$pieces,
 			function ($a, $b) {
