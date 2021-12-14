@@ -9,28 +9,96 @@ class Solver extends DayPuzzle
 {
 	public function runTests()
 	{
-		$handle = $this->getHandleForFile('test');
-		$this->part1Logic($handle);
-		rewind($handle);
-		$this->part2Logic($handle);
+		$map = $this->inputToArray(file($this->getFilePath('test')));
+		$this->part1Logic($map);
+		$this->part2Logic($map);
 	}
 
 	protected function part1()
 	{
+		$this->part1Logic($this->inputToArray(file($this->getFilePath('input'))));
 	}
 
 	protected function part2()
 	{
 	}
 
-	protected function part1Logic($input)
+	protected function part1Logic(array $map)
 	{
+		$riskCount = 0;
+		$lastRowindex = count($map) - 1;
+		array_walk(
+			$map,
+			function ($row, $rowIndex) use ($map, &$riskCount, $lastRowindex) {
+				$lastColumnIndex = count($row) - 1;
+				foreach ($row as $columnIndex => $value) {
+					// 9 can never be a low spot.
+					if (9 === $value) {
+						continue;
+					}
 
+					// A 0 must be a low spot... I think?
+					if (0 === $value) {
+						$riskCount++;
+						continue;
+					}
+
+					// Check all available directions.
+					$comparison = [];
+
+					// To the north.
+					if ($rowIndex > 0) {
+						$comparison['north'] = $map[$rowIndex - 1][$columnIndex] > $value;
+					}
+
+					// To the east.
+					if ($columnIndex < $lastColumnIndex) {
+						$comparison['east'] = $map[$rowIndex][$columnIndex + 1] > $value;
+					}
+
+					// To the south.
+					if ($rowIndex < $lastRowindex) {
+						$comparison['south'] = $map[$rowIndex + 1][$columnIndex] > $value;
+					}
+
+					// To the west.
+					if ($columnIndex > 0) {
+						$comparison['west'] = $map[$rowIndex][$columnIndex - 1] > $value;
+					}
+
+					$isLowest = array_reduce(
+						$comparison,
+						function (bool $carry, bool $value) {
+							return $carry && $value;
+						},
+						true
+					);
+
+					if ($isLowest) {
+						$riskCount += 1 + $value;
+					}
+				}
+			}
+		);
+
+		printf("Risk count is: %d\n", $riskCount);
 	}
 
 	protected function part2Logic($input)
 	{
 
+	}
+
+	protected function inputToArray(array $inputLines): array
+	{
+		return array_filter(
+			array_map(
+				function ($line) {
+					return array_map('intval', str_split(trim($line)));
+				},
+				$inputLines
+			)
+		);
 	}
 
 	protected function getNamespace(): string
