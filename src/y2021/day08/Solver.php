@@ -73,18 +73,9 @@ class Solver extends DayPuzzle
 		}
 	}
 
-	protected function uncrossWires(array $patterns, array $output): array
+	protected function uncrossWires(array $patterns): array
 	{
-		$return = [
-			'a' => '',
-			'b' => '',
-			'c' => '',
-			'd' => '',
-			'e' => '',
-			'f' => '',
-			'g' => '',
-		];
-
+		$digits = [];
 		$pieces = $patterns;
 		usort(
 			$pieces,
@@ -97,7 +88,51 @@ class Solver extends DayPuzzle
 			}
 		);
 
-		return $return;
+		$fives = [];
+		$sixes = [];
+		foreach ($pieces as $piece) {
+			$length = strlen($piece);
+			switch ($length) {
+				case 2:
+					$digits[1] = $piece;
+					break;
+
+				case 3:
+					$digits[7] = $piece;
+					break;
+
+				case 4:
+					$digits[4] = $piece;
+					break;
+
+				// This will give us the digits 2, 3, and 5
+				case 5:
+					$fives[] = $piece;
+					break;
+
+				// This will give us the digits 6, 9, and 0
+				case 6:
+					$sixes[] = $piece;
+					break;
+
+				case 7:
+					$digits[8] = $piece;
+					break;
+			}
+		}
+
+		// Figure out digits with length of five.
+		// The digit for 2 will only have 2 letters in common with 4.
+		$fourPieces = str_split($digits[4]);
+		foreach ($fives as $key => $five) {
+			if (2 === count(str_replace($fourPieces, '', $five))) {
+				$digits[2] = $five;
+				unset($fives[$key]);
+				break;
+			}
+		}
+
+		return $digits;
 	}
 
 	protected function getNamespace(): string
