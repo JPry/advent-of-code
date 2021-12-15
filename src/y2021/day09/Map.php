@@ -2,9 +2,9 @@
 
 namespace JPry\AdventOfCode\y2021\day09;
 
-use ArrayAccess;
+use RuntimeException;
 
-class Map implements ArrayAccess
+class Map
 {
 	protected array $map;
 	protected int $lastRowIndex;
@@ -17,28 +17,19 @@ class Map implements ArrayAccess
 		$this->lastColumnIndex = count($map[0]) - 1;
 	}
 
-	public function offsetExists($offset): bool
+	public function isValidPoint(Point $point): bool
 	{
-		return array_key_exists($offset, $this->map);
+		return $point->row <= $this->lastRowIndex
+			&& $point->column <= $this->lastColumnIndex
+			&& isset($this->map[$point->row][$point->column]);
 	}
 
-	public function offsetGet($offset)
+	public function getValue(Point $point): int
 	{
-		return $this->map[$offset];
-	}
+		if (!$this->isValidPoint($point)) {
+			throw new RuntimeException(sprintf('Point "%s" is invalid for map.', $point));
+		}
 
-	public function offsetSet($offset, $value)
-	{
-		// No need to set in this implementation.
-	}
-
-	public function offsetUnset($offset)
-	{
-		// No need to unset in this implementation.
-	}
-
-	public function isValidPoint(Point $point)
-	{
-		return isset($this->map[$point->row][$point->column]);
+		return $this->map[$point->row][$point->column];
 	}
 }
