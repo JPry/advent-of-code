@@ -24,9 +24,12 @@ class Basin
 			throw new LogicException('Map property not set.');
 		}
 
-		$startingPoints = $this->getSurroundingPoints($this->lowPoint);
-
-
+		if (empty($this->allPoints)) {
+			$this->allPoints[] = $this->lowPoint;
+			$startingPoints = $this->getSurroundingPoints($this->lowPoint);
+			$currentValue = $this->map->getValue($this->lowPoint);
+			$this->walkPoints($startingPoints, $currentValue);
+		}
 	}
 
 	public function getBasinPointCount(): int
@@ -34,31 +37,37 @@ class Basin
 		return count($this->allPoints);
 	}
 
-	protected function walkPoints(array &$points)
+	/**
+	 * @param Point[] $checkPoints
+	 * @param int $currentValue
+	 * @return void
+	 */
+	protected function walkPoints(array &$checkPoints, int $currentValue)
 	{
-		foreach ($points as $point => $_) {
+		foreach ($checkPoints as $coordinate => $point) {
+			if (!$this->map->isValidPoint($point)) {
+				continue;
+			}
 
+			$value = $this->map->getValue($point);
+			if (9 === $value) {
+				continue;
+			}
 		}
-	}
-
-	protected function isPointInBasin()
-	{
-
-	}
-
-	protected function canMapPoint(string $coordinates)
-	{
-		$point = Point::fromString($coordinates);
-		return $this->map->isValidPoint($point) && $this->map[$row][$column] < 9;
 	}
 
 	protected function getSurroundingPoints(Point $point): array
 	{
+		$northPoint = new Point($point->row - 1, $point->column);
+		$eastPoint = new Point($point->row, $point->column + 1);
+		$southPoint = new Point($point->row + 1, $point->column);
+		$westPoint = new Point($point->row, $point->column - 1);
+
 		return [
-			sprintf('%d,%d', $point->row - 1, $point->column) => true,
-			sprintf('%d,%d', $point->row, $point->column + 1) => true,
-			sprintf('%d,%d', $point->row + 1, $point->column) => true,
-			sprintf('%d,%d', $point->row, $point->column - 1) => true,
+			(string)$northPoint => $northPoint,
+			(string)$eastPoint => $eastPoint,
+			(string)$southPoint => $southPoint,
+			(string)$westPoint => $westPoint,
 		];
 	}
 }

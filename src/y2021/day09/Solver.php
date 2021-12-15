@@ -91,7 +91,8 @@ class Solver extends DayPuzzle
 		$sizes = [];
 		foreach ($lowPoints as [$row, $column]) {
 			$basin = new Basin(new Point($row, $column));
-			$basin->mapBasin($map);
+			$basin->setMap(new Map($map));
+			$basin->mapBasin();
 			$sizes[] = $basin->getBasinPointCount();
 		}
 
