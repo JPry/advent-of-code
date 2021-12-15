@@ -21,6 +21,7 @@ class Solver extends DayPuzzle
 
 	protected function part2()
 	{
+		$this->part2Logic($this->inputToArray(file($this->getFilePath('input'))));
 	}
 
 	protected function part1Logic(array $map)
@@ -84,9 +85,26 @@ class Solver extends DayPuzzle
 		printf("Risk count is: %d\n", $riskCount);
 	}
 
-	protected function part2Logic($input)
+	protected function part2Logic(array $map)
 	{
+		$lowPoints = $this->findLowPoints($map);
+		$sizes = [];
+		foreach ($lowPoints as [$row, $column]) {
+			$basin = new Basin(new Point($row, $column));
+			$basin->mapBasin($map);
+			$sizes[] = $basin->getBasinPointCount();
+		}
 
+		rsort($sizes);
+		$result = array_reduce(
+			array_slice($sizes, 0, 3),
+			function (int $carry, int $value) {
+				return $carry * $value;
+			},
+			1
+		);
+
+		printf("Multiple of 3 largest basins is: %d\n", $result);
 	}
 
 	protected function inputToArray(array $inputLines): array
@@ -101,7 +119,7 @@ class Solver extends DayPuzzle
 		);
 	}
 
-	protected function findLowPoints(array $map): array
+	protected function findLowPoints(array &$map): array
 	{
 		$points = [];
 		$lastRowindex = count($map) - 1;
