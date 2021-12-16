@@ -4,6 +4,8 @@
 namespace JPry\AdventOfCode\y2021\day09;
 
 use JPry\AdventOfCode\DayPuzzle;
+use JPry\AdventOfCode\Map;
+use JPry\AdventOfCode\Point;
 
 class Solver extends DayPuzzle
 {

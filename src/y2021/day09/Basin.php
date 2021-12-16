@@ -2,6 +2,9 @@
 
 namespace JPry\AdventOfCode\y2021\day09;
 
+use JPry\AdventOfCode\MapTrait;
+use JPry\AdventOfCode\Point;
+
 use LogicException;
 use RuntimeException;
 

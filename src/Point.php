@@ -1,6 +1,6 @@
 <?php
 
-namespace JPry\AdventOfCode\y2021\day09;
+namespace JPry\AdventOfCode;
 
 use LogicException;
 
