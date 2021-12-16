@@ -3,6 +3,7 @@
 namespace JPry\AdventOfCode\y2021\day09;
 
 use LogicException;
+use RuntimeException;
 
 class Basin
 {
@@ -12,6 +13,8 @@ class Basin
 
 	/** @var Point[] */
 	protected array $allPoints = [];
+
+	protected array $checkedPoints = [];
 
 	public function __construct(Point $lowPoint)
 	{
@@ -25,10 +28,12 @@ class Basin
 		}
 
 		if (empty($this->allPoints)) {
-			$this->allPoints[] = $this->lowPoint;
-			$startingPoints = $this->getSurroundingPoints($this->lowPoint);
-			$currentValue = $this->map->getValue($this->lowPoint);
-			$this->walkPoints($startingPoints, $currentValue);
+			$this->allPoints[(string) $this->lowPoint] = $this->lowPoint;
+			$this->checkedPoints[(string) $this->lowPoint] = true;
+			$this->walkPoints(
+				$this->getSurroundingPoints($this->lowPoint),
+				$this->map->getValue($this->lowPoint)
+			);
 		}
 	}
 
@@ -38,20 +43,31 @@ class Basin
 	}
 
 	/**
-	 * @param Point[] $checkPoints
+	 * @param Point[] $surroundingPoints
 	 * @param int $currentValue
 	 * @return void
 	 */
-	protected function walkPoints(array &$checkPoints, int $currentValue)
+	protected function walkPoints(array $surroundingPoints, int $currentValue): void
 	{
-		foreach ($checkPoints as $coordinate => $point) {
-			if (!$this->map->isValidPoint($point)) {
+		foreach ($surroundingPoints as $coordinate => $point) {
+			if (array_key_exists((string) $point, $this->checkedPoints)) {
 				continue;
 			}
 
-			$value = $this->map->getValue($point);
+			try {
+				$value = $this->map->getValue($point);
+			} catch (RuntimeException $e) {
+				$this->checkedPoints[(string) $point] = true;
+				continue;
+			}
+
 			if (9 === $value) {
 				continue;
+			}
+
+			if ($value > $currentValue) {
+				$this->allPoints[$coordinate] = $point;
+				$this->walkPoints($this->getSurroundingPoints($point), $value);
 			}
 		}
 	}
