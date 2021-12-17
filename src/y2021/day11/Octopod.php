@@ -3,9 +3,17 @@
 namespace JPry\AdventOfCode\y2021\day11;
 
 use JPry\AdventOfCode\Map;
+use JPry\AdventOfCode\Point;
 
 class Octopod extends Map
 {
+	protected int $size;
+
+	public function __construct(array $map)
+	{
+		$this->size = count($map) * count($map[0]);
+		parent::__construct($map);
+	}
 
 	public function energize(): void
 	{
@@ -46,7 +54,27 @@ class Octopod extends Map
 
 	protected function energizeAround(int $rowIndex, int $columnIndex)
 	{
+		$possiblePoints = [];
+		foreach (range(-1, 1) as $row) {
+			$actualRow = $rowIndex + $row;
+			foreach (range(-1, 1) as $column) {
+				// Skip the current point
+				if (0 === $row && 0 === $column) {
+					continue;
+				}
+				$actualColumn = $columnIndex + $column;
+				$newPoint = new Point($actualRow, $actualColumn);
+				$possiblePoints[(string) $newPoint] = $newPoint;
+			}
+		}
 
+		foreach ($possiblePoints as $index => $point) {
+			if (!$this->isValidPoint($point)) {
+				continue;
+			}
+
+			$this->map[$point->row][$point->column]++;
+		}
 	}
 
 	protected function resetEnergy(): void
@@ -59,5 +87,10 @@ class Octopod extends Map
 				}
 			}
 		);
+	}
+
+	public function getSize(): int
+	{
+		return $this->size;
 	}
 }
