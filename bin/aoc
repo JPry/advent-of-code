@@ -81,13 +81,14 @@ $app->add(
 				->setName('new')
 				->setDescription('Create a new test from the template')
 				->addArgument(
-					'day',
-					InputArgument::REQUIRED,
+					'days',
+					InputArgument::IS_ARRAY,
 					'The day solver to run'
 				)
-				->addArgument(
+				->addOption(
 					'year',
-					InputArgument::OPTIONAL,
+					null,
+					InputOption::VALUE_REQUIRED,
 					'The year solver to run.',
 					date('Y')
 				);
@@ -95,34 +96,41 @@ $app->add(
 
 		protected function execute(InputInterface $input, OutputInterface $output): int
 		{
-			$day = $this->normalizeDay($input->getArgument('day'));
-			$year = $input->getArgument('year');
+			$days = array_map(
+				function ($value) {
+					return $this->normalizeDay($value);
+				},
+				$input->getArgument('days')
+			);
+			$year = $input->getOption('year');
 			$baseDir = dirname(__DIR__);
 
-			// Create the input files.
-			$inputBase = "{$baseDir}/input/{$year}/{$day}";
-			if (!file_exists($inputBase)) {
-				mkdir($inputBase);
-			}
+			foreach ($days as $day) {
+				// Create the input files.
+				$inputBase = "{$baseDir}/input/{$year}/{$day}";
+				if (!file_exists($inputBase)) {
+					mkdir($inputBase);
+				}
 
-			touch("{$inputBase}/input.txt");
-			touch("{$inputBase}/test.txt");
+				touch("{$inputBase}/input.txt");
+				touch("{$inputBase}/test.txt");
 
-			// Create the solution files.
-			$templatePath = "{$baseDir}/src/y{$year}/template";
-			$dayPath = "{$baseDir}/src/y{$year}/day{$day}";
+				// Create the solution files.
+				$templatePath = "{$baseDir}/src/y{$year}/template";
+				$dayPath = "{$baseDir}/src/y{$year}/day{$day}";
 
-			if (!file_exists($dayPath)) {
-				mkdir($dayPath);
-			}
+				if (!file_exists($dayPath)) {
+					mkdir($dayPath);
+				}
 
-			foreach (glob("{$templatePath}/*.php") as $file) {
-				$base = basename($file);
-				$contents = file_get_contents($file);
-				file_put_contents(
-					"{$dayPath}/{$base}",
-					str_replace('\\template', "\\day{$day}", $contents)
-				);
+				foreach (glob("{$templatePath}/*.php") as $file) {
+					$base = basename($file);
+					$contents = file_get_contents($file);
+					file_put_contents(
+						"{$dayPath}/{$base}",
+						str_replace('\\template', "\\day{$day}", $contents)
+					);
+				}
 			}
 
 			return Command::SUCCESS;
