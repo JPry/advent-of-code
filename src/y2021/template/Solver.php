@@ -9,10 +9,9 @@ class Solver extends DayPuzzle
 {
 	public function runTests()
 	{
-		$handle = $this->getHandleForFile('test');
-		$this->part1Logic($handle);
-		rewind($handle);
-		$this->part2Logic($handle);
+		$data = $this->getFileAsArray('test');
+		$this->part1Logic($data);
+		$this->part2Logic($data);
 	}
 
 	protected function part1()

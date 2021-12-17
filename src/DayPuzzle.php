@@ -60,6 +60,11 @@ abstract class DayPuzzle
 		return trim(file_get_contents($this->getFilePath($fileName)));
 	}
 
+	protected function getFileAsArray(string $filename = 'input'): array
+	{
+		return file($this->getFilePath($filename), FILE_SKIP_EMPTY_LINES | FILE_IGNORE_NEW_LINES);
+	}
+
 	protected function stringToNumbers(string $string): array
 	{
 		return array_map('intval', explode(',', trim($string)));
