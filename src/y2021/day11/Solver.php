@@ -9,19 +9,19 @@ class Solver extends DayPuzzle
 {
 	public function runTests()
 	{
-		$lines = file($this->getFilePath('test'), FILE_SKIP_EMPTY_LINES | FILE_IGNORE_NEW_LINES);
+		$lines = $this->getFileAsArray('test');
 		$this->part1Logic($lines);
 		$this->part2Logic($lines);
 	}
 
 	protected function part1()
 	{
-		$this->part1Logic(file($this->getFilePath(), FILE_SKIP_EMPTY_LINES | FILE_IGNORE_NEW_LINES));
+		$this->part1Logic($this->getFileAsArray());
 	}
 
 	protected function part2()
 	{
-		$this->part2Logic(file($this->getFilePath(), FILE_SKIP_EMPTY_LINES | FILE_IGNORE_NEW_LINES));
+		$this->part2Logic($this->getFileAsArray());
 	}
 
 	protected function part1Logic(array $lines)
