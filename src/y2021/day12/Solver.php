@@ -59,20 +59,28 @@ class Solver extends DayPuzzle
 
 	protected function countPaths(array &$map, string $point)
 	{
-		static $visited = [];
+		$visited = [];
 		$validPaths = 0;
+		$isSmallCave = false;
 
-		if (array_key_exists($point, $visited)) {
-			return $validPaths;
+		// $caves is an array of all adjacent caves
+		$caves = $map[$point];
+
+		$findValidPaths = function($caves) use (&$map) {
+
+		};
+
+		// Loop through all caves, and all of their caves, and their caves, etc.
+		foreach ($caves as $cave) {
+			$isSmallCave = strtolower($cave) === $cave;
 		}
 
-		if (strtolower($point) === $point) {
-			$visited[$point] = true;
-		}
 
-		foreach ($map[$point] as $caves) {
+	}
 
-		}
+	protected function walkPath()
+	{
+
 	}
 
 	protected function getNamespace(): string
