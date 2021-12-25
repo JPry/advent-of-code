@@ -23,7 +23,12 @@ class Point
 
 	public static function fromString(string $point): self
 	{
-		[$row, $column] = array_map('intval', explode(',', $point));
+		return new self(...array_map('intval', explode(',', $point)));
+	}
+
+	public static function fromReversedString(string $point): self
+	{
+		[$column, $row] = array_map('intval', explode(',', $point));
 
 		return new self($row, $column);
 	}
