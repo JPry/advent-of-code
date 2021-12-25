@@ -32,4 +32,11 @@ class Map
 
 		return $this->map[$point->row][$point->column];
 	}
+
+	protected function validatePoint(Point $point)
+	{
+		if (!$this->isValidPoint($point)) {
+			throw new RuntimeException(sprintf('Point at location "%s" is invalid', $point));
+		}
+	}
 }
