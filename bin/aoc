@@ -7,21 +7,7 @@ use Symfony\Component\Console\Application;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
-trait Utils
-{
-	protected function normalizeDay(string $day): string
-	{
-		return sprintf('%1$02d', intval($day));
-	}
-
-	protected function getBaseNamespace(): string
-	{
-		return 'JPry\\AdventOfCode';
-	}
-}
-
 $app = new Application('Advent of Code', '1.0.0');
-
 $app->addCommands(
 	[
 		new Solve(),
