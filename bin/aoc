@@ -37,12 +37,13 @@ $app->add(
 				->setDescription('Solve a puzzle')
 				->addArgument(
 					'day',
-					InputArgument::REQUIRED,
+					InputArgument::REQUIRED | InputArgument::IS_ARRAY,
 					'The day solver to run'
 				)
-				->addArgument(
+				->addOption(
 					'year',
-					InputArgument::OPTIONAL,
+					null,
+					InputOption::VALUE_REQUIRED,
 					'The year solver to run.',
 					date('Y')
 				)
@@ -56,15 +57,23 @@ $app->add(
 
 		protected function execute(InputInterface $input, OutputInterface $output): int
 		{
-			$day = $this->normalizeDay($input->getArgument('day'));
-			$year = $input->getArgument('year');
+			$days = array_map(
+				function($value) {
+					return $this->normalizeDay($value);
+				},
+				$input->getArgument('day')
+			);
+
+			$year = $input->getOption('year');
 			$doTests = $input->getOption('test');
 
-			$className = "{$this->getBaseNamespace()}\\y{$year}\\day{$day}\\Solver";
+			foreach ($days as $day) {
+				$className = "{$this->getBaseNamespace()}\\y{$year}\\day{$day}\\Solver";
 
-			/** @var DayPuzzle $class */
-			$class = new $className();
-			$doTests ? $class->runTests() : $class->run();
+				/** @var DayPuzzle $class */
+				$class = new $className();
+				$doTests ? $class->runTests() : $class->run();
+			}
 
 			return Command::SUCCESS;
 		}
