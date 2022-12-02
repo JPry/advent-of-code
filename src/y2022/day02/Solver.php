@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace JPry\AdventOfCode\y2022\day02;
 
 use JPry\AdventOfCode\DayPuzzle;
+use JPry\AdventOfCode\Utils\WalkResource;
 
 class Solver extends DayPuzzle
 {
-
+	use WalkResource;
 
 	/**
 	 * rock: 1
@@ -75,14 +76,12 @@ class Solver extends DayPuzzle
 	protected function part1Logic($input)
 	{
 		$playerScore = 0;
-		$opponentScore = 0;
-		while (false !== ($line = fgets($input))) {
-			$line = trim($line);
-			$playerScore += $this->scoreMap[$line]['player'];
-			$opponentScore += $this->scoreMap[$line]['opponent'];
-		}
-
-		fclose($input);
+		$this->walkResourceWithCallback(
+			$input,
+			function($line) use (&$playerScore) {
+				$playerScore += $this->scoreMap[$line]['player'];
+			}
+		);
 
 		printf("The player's score was: %d\n", $playerScore);
 	}
@@ -94,14 +93,14 @@ class Solver extends DayPuzzle
 	protected function part2Logic($input)
 	{
 		$playerScore = 0;
-		while (false !== ($line = fgets($input))) {
-			$line = trim($line);
-			$playerScore += $this->correctScoreMap[$line];
-		}
+		$this->walkResourceWithCallback(
+			$input,
+			function($line) use (&$playerScore) {
+				$playerScore += $this->correctScoreMap[$line];
+			}
+		);
 
-		fclose($input);
-
-		printf("The player's score was: %d\n", $playerScore);
+		printf("The correct player's score was: %d\n", $playerScore);
 	}
 
 	protected function getNamespace(): string

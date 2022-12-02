@@ -4,9 +4,12 @@ declare(strict_types=1);
 namespace JPry\AdventOfCode\y2022\day01;
 
 use JPry\AdventOfCode\DayPuzzle;
+use JPry\AdventOfCode\Utils\WalkResource;
 
 class Solver extends DayPuzzle
 {
+	use WalkResource;
+
 	public function runTests()
 	{
 		$data = $this->getHandleForFile('test');
@@ -32,18 +35,19 @@ class Solver extends DayPuzzle
 	{
 		$elves = [0 => []];
 		$elf = 0;
-		while (false !== ($line = fgets($input))) {
-			$line = trim($line);
-			if ('' === $line) {
-				$elf++;
-				$elves[$elf] ??= [];
-				continue;
+
+		$this->walkResourceWithCallback(
+			$input,
+			function($line) use (&$elves, &$elf) {
+				if ('' === $line) {
+					$elf++;
+					$elves[$elf] ??= [];
+					return;
+				}
+
+				$elves[$elf][] = (int) $line;
 			}
-
-			$elves[$elf][] = (int) $line;
-		}
-
-		fclose($input);
+		);
 
 		$currentMax = 0;
 		$maxElf = 0;
