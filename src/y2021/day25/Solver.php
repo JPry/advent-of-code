@@ -16,15 +16,20 @@ class Solver extends DayPuzzle
 
 	protected function part1()
 	{
+		$this->part1Logic($this->getFileAsArray());
 	}
 
 	protected function part2()
 	{
 	}
 
-	protected function part1Logic($input)
+	protected function part1Logic(array $input)
 	{
+		// Convert the input into cucumbers.
 
+		// Move the eastward ones first
+
+		// Move the southward ones next
 	}
 
 	protected function part2Logic($input)
