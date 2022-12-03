@@ -4,9 +4,12 @@ declare(strict_types=1);
 namespace JPry\AdventOfCode\y2022\day03;
 
 use JPry\AdventOfCode\DayPuzzle;
+use JPry\AdventOfCode\Utils\StringManipulation;
 
 class Solver extends DayPuzzle
 {
+	use StringManipulation;
+
 	public function runTests()
 	{
 		$data = $this->getFileAsArray('test');
@@ -30,8 +33,8 @@ class Solver extends DayPuzzle
 		$count = 0;
 		foreach ($input as $line) {
 			[$first, $second] = str_split($line, strlen($line)/2);
-			$firstPieces = array_fill_keys(str_split($first), 1);
-			$secondPieces = array_fill_keys(str_split($second), 1);
+			$firstPieces = $this->stringToKeyedArray($first);
+			$secondPieces = $this->stringToKeyedArray($second);
 
 			$leftover = array_intersect_key($firstPieces, $secondPieces);
 			$count += $map[array_flip($leftover)[1]];
@@ -52,7 +55,7 @@ class Solver extends DayPuzzle
 			$pieces[] = array_shift($input);
 
 			foreach ($pieces as &$piece) {
-				$piece = array_fill_keys(str_split($piece), 1);
+				$piece = $this->stringToKeyedArray($piece);
 			}
 
 			$common = array_intersect_key(...$pieces);
