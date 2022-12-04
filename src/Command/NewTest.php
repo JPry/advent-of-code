@@ -29,7 +29,7 @@ class NewTest extends Command
 	 */
 	public function __construct(string $name = null)
 	{
-		$this->baseDir = dirname(__DIR__);
+		$this->baseDir = dirname(__DIR__, 2);
 		parent::__construct($name);
 	}
 
@@ -82,7 +82,7 @@ class NewTest extends Command
 			$inputBase = "{$this->baseDir}/input/{$year}/{$day}";
 			if (!file_exists($inputBase)) {
 				mkdir($inputBase);
-				$output->writeln('<info>Created input directory: %s</info>', $inputBase);
+				$output->writeln(sprintf('<info>Created input directory: %s</info>', $inputBase));
 			}
 
 			touch("{$inputBase}/input.txt");
