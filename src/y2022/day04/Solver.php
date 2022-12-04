@@ -51,10 +51,9 @@ class Solver extends DayPuzzle
 			$f = range(...explode('-', $f));
 			$s = range(...explode('-', $s));
 
-			if (count(array_intersect($f, $s))>0) {
+			if (count(array_intersect($f, $s)) > 0) {
 				$overlaps++;
 			}
-
 		}
 
 		printf("There were %d overlaps\n", $overlaps);
