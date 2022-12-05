@@ -14,10 +14,12 @@ trait WalkResource
 	 * @param callable $callback
 	 * @return void
 	 */
-	protected function walkResourceWithCallback($resource, callable $callback)
+	protected function walkResourceWithCallback($resource, callable $callback, bool $trim = true)
 	{
 		while (false !== ($line = fgets($resource))) {
-			$line = trim($line);
+			if ($trim) {
+				$line = trim($line);
+			}
 			call_user_func_array($callback, [$line]);
 		}
 
