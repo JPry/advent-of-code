@@ -24,28 +24,20 @@ class Solver extends DayPuzzle
 		$this->part1Logic($this->getFileContents(), 14);
 	}
 
-	protected function part1Logic($input, $uniqueCount = 4)
+	protected function part1Logic($input, $charLength = 4)
 	{
 		$signal = str_split($input);
-		$charCount = 0;
-		$stack = [];
+		$offset = 0;
 		do {
-			$charCount++;
-			$char = array_shift($signal);
-			$stack[] = $char;
-
-			if ($charCount < $uniqueCount) {
-				continue;
-			}
-
-			if (count(array_unique($stack)) === $uniqueCount) {
+			$slice = array_slice($signal, $offset, $charLength);
+			if (count(array_unique($slice)) === $charLength) {
 				break;
 			}
 
-			array_shift($stack);
+			$offset++;
 		} while (true);
 
-		printf("The first signal is after %d characters\n", $charCount);
+		printf("The first signal is after %d characters\n", $offset + $charLength);
 	}
 
 	protected function part2Logic($input) {}
