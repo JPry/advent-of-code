@@ -7,7 +7,7 @@ abstract class DayPuzzle
 	/**
 	 * @var Input
 	 */
-	protected $input;
+	protected ?Input $input;
 
 	public function __construct(?Input $input = null)
 	{
@@ -68,6 +68,17 @@ abstract class DayPuzzle
 	protected function stringToNumbers(string $string): array
 	{
 		return array_map('intval', explode(',', trim($string)));
+	}
+
+	/**
+	 * Get the contents of a file, split by double new lines.
+	 *
+	 * @param string $filename
+	 * @return array
+	 */
+	protected function splitFileByDoubleNewLine(string $filename = 'input'): array
+	{
+		return explode("\n\n", file_get_contents($this->getFilePath($filename)));
 	}
 
 	abstract protected function getNamespace();
