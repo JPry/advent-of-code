@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace JPry\AdventOfCode\y2022\day07;
 
-use Elastic\Apm\CustomErrorData;
 use Exception;
 use JPry\AdventOfCode\DayPuzzle;
 use JPry\AdventOfCode\Utils\WalkResource;
@@ -14,12 +13,15 @@ class Solver extends DayPuzzle
 
 	protected array $structure = [
 		'/' => [
+			'parent' => '',
 			'children' => [],
 			'size' => 0,
 		]
 	];
 
 	protected array $dirStack = [];
+
+	protected string $currentDir = '';
 
 	public function runTests()
 	{
@@ -49,6 +51,7 @@ class Solver extends DayPuzzle
 
 				if ('$ cd /' === $line) {
 					$this->dirStack = [];
+					$this->currentDir = '/';
 					return;
 				}
 
@@ -61,8 +64,9 @@ class Solver extends DayPuzzle
 					[,, $dirName] = explode(' ', $line);
 					if ('..' === $dirName) {
 						array_pop($this->dirStack);
+						$this->currentDir = $this->structure[$this->currentDir]['parent'];
 					} else {
-						$this->dirStack[] = $dirName;
+						$this->currentDir = $this->hashDir($dirName);
 					}
 					return;
 				}
@@ -72,15 +76,22 @@ class Solver extends DayPuzzle
 					$currentDir = str_replace('//', '/', $currentDir);
 					if (str_starts_with($line, 'dir')) {
 						[, $dirName] = explode(' ', $line);
-						if (array_key_exists($dirName, $this->structure)) {
+						$hashed = $this->hashDir($dirName);
+						if (array_key_exists($hashed, $this->structure)) {
 							throw new Exception("You're in trouble, duplicate dir name found");
 						}
 
-						$newDir = str_replace('//', '/', "{$currentDir}/{$dirName}");
-						$this->structure[$newDir] = [
+						$this->structure[$hashed] = [
+							'parent' => $this->currentDir,
 							'children' => [],
 							'size' => 0,
 						];
+
+
+
+						
+
+
 						$this->structure[$currentDir]['children'][] = $dirName;
 					} else {
 						[$size, $name] = explode(' ', $line);
@@ -129,9 +140,9 @@ class Solver extends DayPuzzle
 		printf("Largest sizes: %d\n", array_sum($sizes));
 	}
 
-	protected function addDir(string $dirName)
+	protected function hashDir(string $dirName): string
 	{
-
+		return md5($dirName);
 	}
 
 	protected function part2Logic($input)
