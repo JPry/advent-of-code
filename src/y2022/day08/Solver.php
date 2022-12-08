@@ -17,6 +17,20 @@ class Solver extends DayPuzzle
 		$data = $this->getInput('test');
 		$this->part1Logic($data);
 		$this->part2Logic($data);
+
+		$test1 = [];
+		for ($i=0; $i < 10; $i++) {
+			$test1[] = array_fill(0, 10, $i);
+		}
+
+		$this->part1Logic($test1);
+
+		$test2 = [];
+		for ($i = 0; $i < 10; $i++) {
+			$test2[] = range(0, 9);
+		}
+
+		$this->part1Logic($test2);
 	}
 
 	protected function part1()
