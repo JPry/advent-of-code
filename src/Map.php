@@ -39,4 +39,24 @@ class Map
 			throw new RuntimeException(sprintf('Point at location "%s" is invalid', $point));
 		}
 	}
+
+	public function getRowCount(): int
+	{
+		return $this->lastRowIndex + 1;
+	}
+
+	public function getColumnCount(): int
+	{
+		return $this->lastColumnIndex + 1;
+	}
+
+	public function getLastRowIndex(): int
+	{
+		return $this->lastRowIndex;
+	}
+
+	public function getLastColumnIndex(): int
+	{
+		return $this->lastColumnIndex;
+	}
 }
