@@ -72,32 +72,29 @@ class Solver extends DayPuzzle
 				}
 
 				if ($listing) {
-					$currentDir = '/' . join('/', $this->dirStack);
-					$currentDir = str_replace('//', '/', $currentDir);
 					if (str_starts_with($line, 'dir')) {
+						// figure out the directory name
 						[, $dirName] = explode(' ', $line);
+
+						// hash to prevent duplicate names
 						$hashed = $this->hashDir($dirName);
 						if (array_key_exists($hashed, $this->structure)) {
-							throw new Exception("You're in trouble, duplicate dir name found");
+							throw new Exception("You're in trouble, duplicate hash found");
 						}
 
+						// add to the structure, including the parent hash
 						$this->structure[$hashed] = [
 							'parent' => $this->currentDir,
 							'children' => [],
 							'size' => 0,
 						];
 
-
-
-						
-
-
-						$this->structure[$currentDir]['children'][] = $dirName;
+						$this->structure[$this->currentDir]['children'][] = $dirName;
 					} else {
 						[$size, $name] = explode(' ', $line);
 						$size = (int) $size;
-						$this->structure[$currentDir]['children'][$name] = $size;
-						$this->structure[$currentDir]['size'] += $size;
+						$this->structure[$this->currentDir]['children'][$name] = $size;
+						$this->structure[$this->currentDir]['size'] += $size;
 					}
 				}
 			}
@@ -109,18 +106,9 @@ class Solver extends DayPuzzle
 				continue;
 			}
 
-			$directoryPieces = explode('/', $directory);
-			array_pop($directoryPieces);
-			$current = join('/', $directoryPieces);
-			$current = $current ?: '/';
-
 			do {
-				$this->structure[$current]['size'] += $data['size'];
-
-				array_pop($directoryPieces);
-				$current = join('/', $directoryPieces);
-				$current = $current ?: '/';
-
+				$this->structure[$data['parent']]['size'] += $data['size'];
+				$current = $data['parent'];
 				$data = $this->structure[$current];
 			} while ('/' !== $current);
 		}
@@ -142,7 +130,8 @@ class Solver extends DayPuzzle
 
 	protected function hashDir(string $dirName): string
 	{
-		return md5($dirName);
+		$path = str_replace('//', '/', sprintf('/%s', join('/', $this->dirStack)));
+		return md5("{$path}/{$dirName}");
 	}
 
 	protected function part2Logic($input)
