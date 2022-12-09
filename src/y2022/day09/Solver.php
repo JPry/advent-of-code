@@ -12,7 +12,14 @@ class Solver extends DayPuzzle
 {
 	use WalkResource;
 
+	/** @var array */
 	protected $map = [];
+
+	/** @var int */
+	protected $row = 0;
+
+	/** @var int  */
+	protected $col = 0;
 
 	public function runTests()
 	{
@@ -67,33 +74,46 @@ class Solver extends DayPuzzle
 		// We start at 0,0, so mark that as being visited
 		$this->map[0][0] = 1;
 
-		$row = 0;
-		$col = 0;
-
 		// We need to work through each line.
 		$this->walkResourceWithCallback(
 			$input,
-			function($line) use (&$head, &$tail, &$col, &$row) {
+			function($line) use (&$head, &$tail) {
 				[$direction, $distance] = explode(' ', $line);
 				$distance = (int) $distance;
 
 				// See if we have enough room to move, and expand the map if necessary.
-				$where = $direction === 'L' || $direction === 'U'
-					? 'before'
-					: 'after';
-
 				switch ($direction) {
 					case 'L':
-						$difference = $col - $distance;
+						$difference = $this->col - $distance;
 						if ($difference < 0) {
+							// Add more columns to the left
+							$this->addColumns('before', abs($difference));
+						}
+						break;
 
+					case 'R':
+						$difference = $this->col + $distance;
+						if ($difference >= count($this->map[0])) {
+							$this->addColumns('after', $difference - count($this->map[0]));
 						}
 						break;
 
 					case 'U':
-						$difference = $row - $distance;
+						$difference = $this->row - $distance;
+						if ($difference < 0) {
+							$this->addRows('before', abs($difference));
+						}
+						break;
+
+					case 'D':
+						$difference = $this->row + $distance;
+						if ($difference >= count($this->map)) {
+							$this->addRows('after', $difference - count($this->map));
+						}
+						break;
 				}
 
+				// Do the moving.
 				while ($distance > 0) {
 
 					$distance--;
@@ -118,6 +138,7 @@ class Solver extends DayPuzzle
 
 	protected function addRows(string $where, int $number)
 	{
+		printf("Adding new %d new rows %s\n", $number, $where);
 		$cols = count($this->map[0]);
 		$newRows = array_fill(
 			0,
@@ -128,10 +149,11 @@ class Solver extends DayPuzzle
 		switch ($where) {
 			case 'before':
 				array_unshift($this->map, ...$newRows);
+				$this->row += $number;
 				break;
 
 			case 'after':
-				$map = array_merge($this->map, $newRows);
+				$this->map = array_merge($this->map, $newRows);
 				break;
 
 			default:
@@ -142,10 +164,12 @@ class Solver extends DayPuzzle
 	protected function addColumns(string $where, int $number)
 	{
 		$newColumns = array_fill(0, $number, 0);
+		printf("Adding new %d new columns %s\n", $number, $where);
 		foreach ($this->map as &$row) {
 			switch ($where) {
 				case 'before':
 					$row = array_merge($newColumns, $row);
+					$this->col += $number;
 					break;
 
 				case 'after':
