@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace JPry\AdventOfCode\y2022\day11;
@@ -140,6 +141,7 @@ class Solver extends DayPuzzle
 
 	protected function part2()
 	{
+		$this->part2Logic();
 	}
 
 	protected function part1Logic()
@@ -174,9 +176,37 @@ class Solver extends DayPuzzle
 		printf("The product is %d\n", $result);
 	}
 
-	protected function part2Logic($input)
+	protected function part2Logic()
 	{
+		$round = 1;
+		$this->inspections = [];
+		do {
+			foreach ($this->monkeys as $index => &$monkey) {
+				$this->inspections[$index] ??= 0;
+				foreach ($monkey['items'] as $item) {
+					$result = $monkey['operation']($item);
+//					$result = (int) floor($result / 3);
+					$throwTo = $monkey['test']($result);
+					$this->monkeys[$throwTo]['items'][] = $result;
+					$this->inspections[$index]++;
+				}
 
+				// All of this monkey's items have been thrown.
+				$monkey['items'] = [];
+			}
+			$round++;
+		} while ($round <= 10000);
+
+		rsort($this->inspections);
+		$result = array_reduce(
+			array_slice($this->inspections, 0, 2),
+			function($carry, $item) {
+				return $carry * $item;
+			},
+			1
+		);
+
+		printf("The product is %d\n", $result);
 	}
 
 	protected function getNamespace(): string
