@@ -71,6 +71,7 @@ class Solver extends DayPuzzle
 				'test' => function ($value) {
 					return ($value % 7) === 0 ? 6 : 7;
 				},
+				'mod' => 7,
 			],
 			[
 				'items' => [76, 62, 61, 54, 69, 60, 85],
@@ -80,6 +81,7 @@ class Solver extends DayPuzzle
 				'test' => function ($value) {
 					return ($value % 17) === 0 ? 0 : 6;
 				},
+				'mod' => 17,
 			],
 			[
 				'items' => [83, 89, 53],
@@ -89,6 +91,7 @@ class Solver extends DayPuzzle
 				'test' => function ($value) {
 					return ($value % 11) === 0 ? 5 : 3;
 				},
+				'mod' =>11,
 			],
 			[
 				'items' => [95, 94, 85, 57],
@@ -98,6 +101,7 @@ class Solver extends DayPuzzle
 				'test' => function ($value) {
 					return ($value % 13) === 0 ? 0 : 1;
 				},
+				'mod' => 13,
 			],
 			[
 				'items' => [82, 98],
@@ -107,6 +111,7 @@ class Solver extends DayPuzzle
 				'test' => function ($value) {
 					return ($value % 19) === 0 ? 5 : 2;
 				},
+				'mod' => 19,
 			],
 			[
 				'items' => [69],
@@ -116,6 +121,7 @@ class Solver extends DayPuzzle
 				'test' => function ($value) {
 					return ($value % 2) === 0 ? 1 : 3;
 				},
+				'mod' => 2,
 			],
 			[
 				'items' => [82, 70, 58, 87, 59, 99, 92, 65],
@@ -125,6 +131,7 @@ class Solver extends DayPuzzle
 				'test' => function ($value) {
 					return ($value % 5) === 0 ? 7 : 4;
 				},
+				'mod' => 5,
 			],
 			[
 				'items' => [91, 53, 96, 98, 68, 82],
@@ -134,6 +141,7 @@ class Solver extends DayPuzzle
 				'test' => function ($value) {
 					return ($value % 3) === 0 ? 4 : 2;
 				},
+				'mod' => 3,
 			],
 		];
 		$this->part1Logic();
@@ -147,6 +155,7 @@ class Solver extends DayPuzzle
 	protected function part1Logic()
 	{
 		$round = 1;
+		$this->inspections = [];
 		do {
 			foreach ($this->monkeys as $index => &$monkey) {
 				$this->inspections[$index] ??= 0;
@@ -185,7 +194,7 @@ class Solver extends DayPuzzle
 				$this->inspections[$index] ??= 0;
 				foreach ($monkey['items'] as $item) {
 					$result = $monkey['operation']($item);
-//					$result = (int) floor($result / 3);
+
 					$throwTo = $monkey['test']($result);
 					$this->monkeys[$throwTo]['items'][] = $result;
 					$this->inspections[$index]++;
