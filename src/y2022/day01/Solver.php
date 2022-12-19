@@ -6,6 +6,11 @@ namespace JPry\AdventOfCode\y2022\day01;
 use JPry\AdventOfCode\DayPuzzle;
 use JPry\AdventOfCode\Utils\WalkResource;
 
+/**
+ * Day Solver Class.
+ *
+ * @link https://adventofcode.com/2022/day/1
+ */
 class Solver extends DayPuzzle
 {
 	use WalkResource;

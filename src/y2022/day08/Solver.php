@@ -8,6 +8,11 @@ use JPry\AdventOfCode\Map;
 use JPry\AdventOfCode\MapTrait;
 use JPry\AdventOfCode\Point;
 
+/**
+ * Day Solver Class.
+ *
+ * @link https://adventofcode.com/2022/day/8
+ */
 class Solver extends DayPuzzle
 {
 	use MapTrait;

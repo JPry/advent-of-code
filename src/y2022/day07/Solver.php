@@ -7,6 +7,11 @@ use Exception;
 use JPry\AdventOfCode\DayPuzzle;
 use JPry\AdventOfCode\Utils\WalkResource;
 
+/**
+ * Day Solver Class.
+ *
+ * @link https://adventofcode.com/2022/day/7
+ */
 class Solver extends DayPuzzle
 {
 	use WalkResource;

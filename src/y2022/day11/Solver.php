@@ -7,6 +7,11 @@ namespace JPry\AdventOfCode\y2022\day11;
 use JPry\AdventOfCode\DayPuzzle;
 use JPry\AdventOfCode\Utils\StringManipulation;
 
+/**
+ * Day Solver Class.
+ *
+ * @link https://adventofcode.com/2022/day/11
+ */
 class Solver extends DayPuzzle
 {
 	use StringManipulation;

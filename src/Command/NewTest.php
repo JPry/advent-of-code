@@ -102,7 +102,7 @@ class NewTest extends Command
 				$newPath = "{$dayPath}/{$base}";
 				file_put_contents(
 					$newPath,
-					str_replace('\\template', "\\day{$day}", $contents)
+					str_replace(['\\template', '%DAY%'], ["\\day{$day}", $day], $contents)
 				);
 				$output->writeln(sprintf('<info>Created file:            %s', $newPath));
 			}
@@ -141,6 +141,11 @@ namespace JPry\\AdventOfCode\\y{$year}\\template;
 
 use JPry\\AdventOfCode\\DayPuzzle;
 
+/**
+ * Day Solver Class.
+ *
+ * @link https://adventofcode.com/{$year}/day/%DAY%
+ */
 class Solver extends DayPuzzle
 {
 	public function runTests()

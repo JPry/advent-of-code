@@ -5,6 +5,11 @@ namespace JPry\AdventOfCode\y2022\day12;
 
 use JPry\AdventOfCode\DayPuzzle;
 
+/**
+ * Day Solver Class.
+ *
+ * @link https://adventofcode.com/2022/day/12
+ */
 class Solver extends DayPuzzle
 {
 	public function runTests()

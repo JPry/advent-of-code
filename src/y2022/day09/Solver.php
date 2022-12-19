@@ -9,6 +9,11 @@ use JPry\AdventOfCode\MovablePoint;
 use JPry\AdventOfCode\Point;
 use JPry\AdventOfCode\Utils\WalkResource;
 
+/**
+ * Day Solver Class.
+ *
+ * @link https://adventofcode.com/2022/day/9
+ */
 class Solver extends DayPuzzle
 {
 	use WalkResource;
