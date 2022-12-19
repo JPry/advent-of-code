@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace JPry\AdventOfCode\y2022\day19;
 
 use JPry\AdventOfCode\DayPuzzle;
+use JPry\AdventOfCode\Utils\WalkResource;
 
 /**
  * Day Solver Class.
@@ -12,9 +13,11 @@ use JPry\AdventOfCode\DayPuzzle;
  */
 class Solver extends DayPuzzle
 {
+	use WalkResource;
+
 	public function runTests()
 	{
-		$data = $this->getFileAsArray('test');
+		$data = $this->getHandleForFile('test');
 		$this->part1Logic($data);
 		$this->part2Logic($data);
 	}
@@ -35,6 +38,20 @@ class Solver extends DayPuzzle
 	protected function part2Logic($input)
 	{
 
+	}
+
+	/**
+	 * @param resource $file
+	 * @return void
+	 */
+	protected function parseBlueprints($file)
+	{
+		$this->walkResourceWithCallback(
+			$file,
+			function($line) {
+				[$b, $r] = explode(': ', $line);
+			}
+		);
 	}
 
 	protected function getNamespace(): string
