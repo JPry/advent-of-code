@@ -3,6 +3,7 @@
 namespace JPry\AdventOfCode\Command;
 
 use LogicException;
+use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -60,22 +61,37 @@ class NewTest extends Command
 
 	protected function execute(InputInterface $input, OutputInterface $output): int
 	{
-		$days = array_map(
-			function($value) {
-				return $this->normalizeDay($value);
-			},
-			$input->getArgument('days')
-		);
+		// Determine if we need to create a new year first.
 		$year = $input->getOption('year');
-
-		if (empty($days)) {
-			$output->writeln('<error>No days specified</error>');
-			return Command::FAILURE;
-		}
-
 		if ($input->getOption('new-year')) {
 			$this->createNewYear($year, $output);
 		}
+
+		// Set up the days to create.
+		/** @var array $days */
+		$days = $input->getArgument('days');
+		if (empty($days)) {
+			$output->writeln('<error>Not enough arguments (missing: "days").</error>');
+			return Command::FAILURE;
+		}
+
+		// Check to see if days was entered as a range.
+		if (count($days) === 1 && false !== strpos($days[0], '..')) {
+			preg_match('#(\d+)\.\.(\d+)#', $days[0], $matches);
+			if (isset($matches[1], $matches[2])) {
+				$days = range(...array_slice($matches, 1, 2));
+			}
+		}
+
+		$days = array_map(
+			function($value) {
+				if ((int) $value > 25) {
+					throw new RuntimeException(sprintf("One of the day values was too high. Found %s", $value));
+				}
+				return $this->normalizeDay($value);
+			},
+			$days
+		);
 
 		foreach ($days as $day) {
 			// Create the input files.
@@ -94,17 +110,21 @@ class NewTest extends Command
 
 			if (!file_exists($dayPath)) {
 				mkdir($dayPath);
-				$output->writeln(sprintf('<info>Created day files: %s</info>', $dayPath));
+				$output->writeln(sprintf('<info>Created day files:       %s</info>', $dayPath));
 			}
 
 			foreach (glob("{$templatePath}/*.php") as $file) {
 				$base = basename($file);
 				$contents = file_get_contents($file);
+				$newPath = "{$dayPath}/{$base}";
 				file_put_contents(
-					"{$dayPath}/{$base}",
+					$newPath,
 					str_replace('\\template', "\\day{$day}", $contents)
 				);
+				$output->writeln(sprintf('<info>Created file:            %s', $newPath));
 			}
+
+			$output->writeln('');
 		}
 
 		return Command::SUCCESS;
