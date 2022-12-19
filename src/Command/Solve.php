@@ -25,7 +25,7 @@ class Solve extends Command
 			->setName('solve')
 			->setDescription('Solve a puzzle')
 			->addArgument(
-				'day',
+				'days',
 				InputArgument::REQUIRED | InputArgument::IS_ARRAY,
 				'The day solver to run'
 			)
@@ -46,13 +46,7 @@ class Solve extends Command
 
 	protected function execute(InputInterface $input, OutputInterface $output): int
 	{
-		$days = array_map(
-			function($value) {
-				return $this->normalizeDay($value);
-			},
-			$input->getArgument('day')
-		);
-
+		$days = $this->normalizeDays($input->getArgument('days'));
 		$year = $input->getOption('year');
 		$doTests = $input->getOption('test');
 

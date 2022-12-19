@@ -2,8 +2,8 @@
 
 namespace JPry\AdventOfCode\Command;
 
+use Exception;
 use LogicException;
-use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -68,30 +68,13 @@ class NewTest extends Command
 		}
 
 		// Set up the days to create.
-		/** @var array $days */
-		$days = $input->getArgument('days');
-		if (empty($days)) {
-			$output->writeln('<error>Not enough arguments (missing: "days").</error>');
+		try {
+			/** @var array $days */
+			$days = $this->normalizeDays($input->getArgument('days'));
+		} catch (Exception $e) {
+			$output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
 			return Command::FAILURE;
 		}
-
-		// Check to see if days was entered as a range.
-		if (count($days) === 1 && false !== strpos($days[0], '..')) {
-			preg_match('#(\d+)\.\.(\d+)#', $days[0], $matches);
-			if (isset($matches[1], $matches[2])) {
-				$days = range(...array_slice($matches, 1, 2));
-			}
-		}
-
-		$days = array_map(
-			function($value) {
-				if ((int) $value > 25) {
-					throw new RuntimeException(sprintf("One of the day values was too high. Found %s", $value));
-				}
-				return $this->normalizeDay($value);
-			},
-			$days
-		);
 
 		foreach ($days as $day) {
 			// Create the input files.
