@@ -3,6 +3,7 @@
 namespace JPry\AdventOfCode\Command;
 
 use Exception;
+use JPry\AdventOfCode\Utils\BaseDir;
 use LogicException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -18,6 +19,7 @@ use JPry\AdventOfCode\Utils\Utils;
  */
 class NewTest extends Command
 {
+	use BaseDir;
 	use Utils;
 
 	/** @var string */
@@ -30,7 +32,7 @@ class NewTest extends Command
 	 */
 	public function __construct(string $name = null)
 	{
-		$this->baseDir = dirname(__DIR__, 2);
+		$this->baseDir = $this->getBaseDir();
 		parent::__construct($name);
 	}
 
@@ -78,7 +80,7 @@ class NewTest extends Command
 
 		foreach ($days as $day) {
 			// Create the input files.
-			$inputBase = "{$this->baseDir}/input/{$year}/{$day}";
+			$inputBase = "{$this->getInputBaseDir()}/{$year}/{$day}";
 			if (!file_exists($inputBase)) {
 				mkdir($inputBase);
 				$output->writeln(sprintf('<info>Created input directory: %s</info>', $inputBase));
