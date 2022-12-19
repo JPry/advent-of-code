@@ -5,9 +5,13 @@ namespace JPry\AdventOfCode\Command;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\SetCookie;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\ServerException;
+use GuzzleHttp\Psr7\Message;
 use JPry\AdventOfCode\Utils\BaseDir;
 use JPry\AdventOfCode\Utils\Utils;
-use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,8 +21,6 @@ use Symfony\Component\Dotenv\Dotenv;
 
 /**
  * Class DownloadInput
- *
- * @since %VERSION%
  */
 class DownloadInput extends Command
 {
@@ -59,8 +61,7 @@ class DownloadInput extends Command
 	 *
 	 * @return int 0 if everything went fine, or an exit code
 	 *
-	 * @throws LogicException When this abstract method is not implemented
-	 *
+	 * @throws GuzzleException When there is a problem with the request.
 	 * @see setCode()
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output)
@@ -75,6 +76,7 @@ class DownloadInput extends Command
 			]
 		);
 
+		$errors = 0;
 		foreach ($days as $day) {
 			$inputPath = "{$this->getInputBaseDir()}/{$year}/{$day}/input.txt";
 
@@ -85,19 +87,29 @@ class DownloadInput extends Command
 			}
 
 			// Download and save the input data.
-			$intDay = (int) $day;
-			$url = "/{$year}/day/{$intDay}/input";
-			$response = $client->get($url);
+			try {
+				$intDay = (int)$day;
+				$url = "/{$year}/day/{$intDay}/input";
+				$response = $client->get($url);
 
-			if (200 !== $response->getStatusCode()) {
-				throw new RuntimeException($response->getReasonPhrase(), $response->getStatusCode());
+				file_put_contents($inputPath, $response->getBody());
+				$output->writeln(sprintf('<info>Added content to input file: %s</info>', $inputPath));
+			} catch (ClientException $e) {
+				$errors++;
+				$output->writeln(sprintf("<info>Request:\n%s</info>", Message::toString($e->getRequest())));
+				$output->writeln(sprintf("<error>Client error:\n%s</error>", Message::toString($e->getResponse())));
+			} catch (ConnectException $e) {
+				$errors++;
+				$output->writeln(sprintf("<info>Request:\n%s</info>", Message::toString($e->getRequest())));
+				$output->writeln(sprintf("<error>Networking error:\n%s</error>", $e->getMessage()));
+			} catch (ServerException $e) {
+				$errors++;
+				$output->writeln(sprintf("<info>Request:\n%s</info>", Message::toString($e->getRequest())));
+				$output->writeln(sprintf("<error>Server error:\n%s</error>", Message::toString($e->getResponse())));
 			}
-
-			file_put_contents($inputPath, $response->getBody());
-			$output->writeln(sprintf('<info>Added content to input file: %s</info>', $inputPath));
 		}
 
-		return Command::SUCCESS;
+		return $errors > 0 ? Command::FAILURE : Command::SUCCESS;
 	}
 
 	protected function getCookies(): array
