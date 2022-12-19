@@ -1,17 +1,28 @@
 #!/usr/bin/env php
 <?php
 
+use JPry\AdventOfCode\Command\DownloadInput;
 use JPry\AdventOfCode\Command\NewTest;
 use JPry\AdventOfCode\Command\Solve;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Dotenv\Dotenv;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
+
+if (!file_exists(dirname(__DIR__) . '/.env')) {
+	throw new Exception('Please create the .env file by copying .env.sample');
+}
+
+(new Dotenv())
+	->usePutenv()
+	->load(dirname(__DIR__) . '/.env');
 
 $app = new Application('Advent of Code', '1.0.0');
 $app->addCommands(
 	[
-		new Solve(),
+		new DownloadInput(),
 		new NewTest(),
+		new Solve(),
 	]
 );
 
