@@ -77,6 +77,12 @@ class DownloadInput extends Command
 				continue;
 			}
 
+			// Check if this is a day in the future and don't try to download.
+			if ($isCurrentYear && $currentDay < $day) {
+				$output->writeln(sprintf('<info>Day %d of year %s is in the future. Skipping download attempt...</info>', $day, $year));
+				continue;
+			}
+
 			// Download and save the input data.
 			try {
 				$intDay   = (int) $day;
