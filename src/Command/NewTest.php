@@ -8,6 +8,7 @@ use JPry\AdventOfCode\Utils\DayArgument;
 use JPry\AdventOfCode\Utils\YearOption;
 use LogicException;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -49,6 +50,12 @@ class NewTest extends Command
 				null,
 				InputOption::VALUE_NONE,
 				'Whether to generate a new year of puzzles'
+			)
+			->addOption(
+				'download',
+				'd',
+				InputOption::VALUE_NONE,
+				'Whether to download the input data (if available).'
 			);
 	}
 
@@ -91,8 +98,13 @@ class NewTest extends Command
 
 			foreach (glob("{$templatePath}/*.php") as $file) {
 				$base     = basename($file);
-				$contents = file_get_contents($file);
 				$newPath  = "{$dayPath}/{$base}";
+				if (file_exists($newPath)) {
+					$output->writeln(sprintf('<info>File "%s" exists, skipping...</info>', $base));
+					continue;
+				}
+
+				$contents = file_get_contents($file);
 				file_put_contents(
 					$newPath,
 					str_replace(['\\template', '%DAY%'], ["\\day{$day}", $day], $contents)
@@ -101,6 +113,19 @@ class NewTest extends Command
 			}
 
 			$output->writeln('');
+		}
+
+		if ($input->getOption('download')) {
+			$command = $this->getApplication()->get('input:download');
+			$command->run(
+				new ArrayInput(
+					[
+						'days'   => $days,
+						'--year' => $year,
+					]
+				),
+				$output
+			);
 		}
 
 		return Command::SUCCESS;
