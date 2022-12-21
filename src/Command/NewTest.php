@@ -4,13 +4,13 @@ namespace JPry\AdventOfCode\Command;
 
 use Exception;
 use JPry\AdventOfCode\Utils\BaseDir;
+use JPry\AdventOfCode\Utils\DayArgument;
+use JPry\AdventOfCode\Utils\YearOption;
 use LogicException;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use JPry\AdventOfCode\Utils\Utils;
 
 /**
  * Class NewTest
@@ -20,7 +20,8 @@ use JPry\AdventOfCode\Utils\Utils;
 class NewTest extends Command
 {
 	use BaseDir;
-	use Utils;
+	use DayArgument;
+	use YearOption;
 
 	/** @var string */
 	private $baseDir;
@@ -41,18 +42,8 @@ class NewTest extends Command
 		$this
 			->setName('new')
 			->setDescription('Create a new test from the template')
-			->addArgument(
-				'days',
-				InputArgument::IS_ARRAY,
-				'The day solver to run'
-			)
-			->addOption(
-				'year',
-				null,
-				InputOption::VALUE_REQUIRED,
-				'The year solver to run.',
-				date('Y')
-			)
+			->configureDayArgument()
+			->configureYearOption()
 			->addOption(
 				'new-year',
 				null,
@@ -91,7 +82,7 @@ class NewTest extends Command
 
 			// Create the solution files.
 			$templatePath = "{$this->baseDir}/src/y{$year}/template";
-			$dayPath = "{$this->baseDir}/src/y{$year}/day{$day}";
+			$dayPath      = "{$this->baseDir}/src/y{$year}/day{$day}";
 
 			if (!file_exists($dayPath)) {
 				mkdir($dayPath);
@@ -99,9 +90,9 @@ class NewTest extends Command
 			}
 
 			foreach (glob("{$templatePath}/*.php") as $file) {
-				$base = basename($file);
+				$base     = basename($file);
 				$contents = file_get_contents($file);
-				$newPath = "{$dayPath}/{$base}";
+				$newPath  = "{$dayPath}/{$base}";
 				file_put_contents(
 					$newPath,
 					str_replace(['\\template', '%DAY%'], ["\\day{$day}", $day], $contents)
@@ -119,8 +110,8 @@ class NewTest extends Command
 	{
 		// Create the directories
 		$directories = [
-			'input' => "{$this->baseDir}/input/{$year}",
-			'year' => "{$this->baseDir}/src/y{$year}",
+			'input'    => "{$this->baseDir}/input/{$year}",
+			'year'     => "{$this->baseDir}/src/y{$year}",
 			'template' => "{$this->baseDir}/src/y{$year}/template",
 		];
 

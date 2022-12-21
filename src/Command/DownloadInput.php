@@ -11,13 +11,11 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Psr7\Message;
 use JPry\AdventOfCode\Utils\BaseDir;
-use JPry\AdventOfCode\Utils\Utils;
+use JPry\AdventOfCode\Utils\DayArgument;
+use JPry\AdventOfCode\Utils\YearOption;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Dotenv\Dotenv;
 
 /**
  * Class DownloadInput
@@ -25,7 +23,8 @@ use Symfony\Component\Dotenv\Dotenv;
 class DownloadInput extends Command
 {
 	use BaseDir;
-	use Utils;
+	use DayArgument;
+	use YearOption;
 
 	/**
 	 * Configures the current command.
@@ -36,19 +35,8 @@ class DownloadInput extends Command
 			->setName('input:download')
 			->setAliases(['input'])
 			->setDescription('Download input file(s) directly from Advent of Code')
-			->addArgument(
-				'days',
-				InputArgument::IS_ARRAY,
-				'The day(s) of input to obtain. Cannot obtain future days',
-				[date('j')]
-			)
-			->addOption(
-				'year',
-				null,
-				InputOption::VALUE_REQUIRED,
-				'The year to obtain. Defaults to the current year.',
-				date('Y')
-			);
+			->configureDayArgument()
+			->configureYearOption();
 	}
 
 	/**
@@ -69,10 +57,13 @@ class DownloadInput extends Command
 		$days = $this->normalizeDays($input->getArgument('days'));
 		$year = $input->getOption('year');
 
+		[$currentDay, $currentYear] = array_map('intval', explode(',', date('j,Y')));
+		$isCurrentYear = (int) $year === $currentYear;
+
 		$client = new Client(
 			[
 				'base_uri' => 'https://adventofcode.com',
-				'cookies' => new CookieJar(true, $this->getCookies()),
+				'cookies'  => new CookieJar(true, $this->getCookies()),
 			]
 		);
 
@@ -88,8 +79,8 @@ class DownloadInput extends Command
 
 			// Download and save the input data.
 			try {
-				$intDay = (int)$day;
-				$url = "/{$year}/day/{$intDay}/input";
+				$intDay   = (int) $day;
+				$url      = "/{$year}/day/{$intDay}/input";
 				$response = $client->get($url);
 
 				file_put_contents($inputPath, $response->getBody());
@@ -118,10 +109,10 @@ class DownloadInput extends Command
 
 		$cookies[] = new SetCookie(
 			[
-				'Domain' => '.adventofcode.com',
-				'Name' => 'session',
-				'Value' => getenv('AOC_SESSION'),
-				'Secure' => true,
+				'Domain'   => '.adventofcode.com',
+				'Name'     => 'session',
+				'Value'    => getenv('AOC_SESSION'),
+				'Secure'   => true,
 				'HttpOnly' => true,
 			]
 		);

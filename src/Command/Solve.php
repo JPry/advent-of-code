@@ -3,8 +3,9 @@
 namespace JPry\AdventOfCode\Command;
 
 use JPry\AdventOfCode\DayPuzzle;
+use JPry\AdventOfCode\Utils\DayArgument;
+use JPry\AdventOfCode\Utils\YearOption;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -16,17 +17,15 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class Solve extends Command
 {
+	use DayArgument;
+	use YearOption;
 
 	protected function configure()
 	{
 		$this
 			->setName('solve')
 			->setDescription('Solve a puzzle')
-			->addArgument(
-				'days',
-				InputArgument::REQUIRED | InputArgument::IS_ARRAY,
-				'The day solver to run'
-			)
+			->configureDayArgument()
 			->addOption(
 				'year',
 				null,
