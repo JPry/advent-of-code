@@ -8,7 +8,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use JPry\AdventOfCode\Utils\Utils;
 
 /**
  * Class Solve
@@ -17,7 +16,6 @@ use JPry\AdventOfCode\Utils\Utils;
  */
 class Solve extends Command
 {
-	use Utils;
 
 	protected function configure()
 	{
@@ -59,5 +57,10 @@ class Solve extends Command
 		}
 
 		return Command::SUCCESS;
+	}
+
+	protected function getBaseNamespace(): string
+	{
+		return 'JPry\\AdventOfCode';
 	}
 }
