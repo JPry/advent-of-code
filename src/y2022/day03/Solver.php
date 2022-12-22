@@ -24,17 +24,16 @@ class Solver extends DayPuzzle
 
 	protected function part1()
 	{
-		$this->part1Logic($this->getFileAsArray('input'));
+		$this->part1Logic($this->getFileAsArray());
 	}
 
 	protected function part2()
 	{
-		$this->part2Logic($this->getFileAsArray('input'));
+		$this->part2Logic($this->getFileAsArray());
 	}
 
 	protected function part1Logic($input)
 	{
-		$map = $this->getScoreMap();
 		$count = 0;
 		foreach ($input as $line) {
 			[$first, $second] = str_split($line, strlen($line)/2);
@@ -42,7 +41,7 @@ class Solver extends DayPuzzle
 			$secondPieces = $this->stringToKeyedArray($second);
 
 			$leftover = array_intersect_key($firstPieces, $secondPieces);
-			$count += $map[array_flip($leftover)[1]];
+			$count += $this->calculateValue(array_flip($leftover)[1]);
 		}
 
 		printf("The count was: %d\n", $count);
@@ -50,24 +49,20 @@ class Solver extends DayPuzzle
 
 	protected function part2Logic($input)
 	{
-		$map = $this->getScoreMap();
 		$count = 0;
+		$offset = 0;
 
 		do {
-			// get 3 items.
-			$pieces[] = array_shift($input);
-			$pieces[] = array_shift($input);
-			$pieces[] = array_shift($input);
-
-			foreach ($pieces as &$piece) {
-				$piece = $this->stringToKeyedArray($piece);
-			}
+			$pieces = array_map(
+				[$this, 'stringToKeyedArray'],
+				array_slice($input, $offset, 3)
+			);
 
 			$common = array_intersect_key(...$pieces);
-			$count += $map[array_flip($common)[1]];
+			$count += $this->calculateValue(array_flip($common)[1]);
 
-			$pieces = [];
-		} while (count($input) >= 3);
+			$offset += 3;
+		} while (count($input) > $offset);
 
 		printf("The count was: %d\n", $count);
 	}
@@ -78,13 +73,17 @@ class Solver extends DayPuzzle
 	}
 
 	/**
-	 * @return array|false
+	 * Use ASCII values to calculate an integer.
+	 *
+	 * @link https://www.man7.org/linux/man-pages/man7/ascii.7.html
+	 *
+	 * @param string $char
+	 *
+	 * @return int
 	 */
-	protected function getScoreMap()
+	protected function calculateValue(string $char): int
 	{
-		return array_combine(
-			array_merge(range('a', 'z'), range('A', 'Z')),
-			range(1, 52)
-		);
+		$value = ord($char);
+		return $value >= 97 ? $value - 96 : $value - 38;
 	}
 }
