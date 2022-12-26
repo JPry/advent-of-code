@@ -34,13 +34,13 @@ abstract class DayPuzzle
 	{
 		$namespace = $this->getNamespace();
 		$namespace = str_replace([__NAMESPACE__, '\\'], ['', '/'], $namespace);
-		$namespace = preg_replace('#/([^\d]+)?(\d+)#', '/$2', $namespace);
+		$namespace = preg_replace('#/(\D+)?(\d+)#', '/$2', $namespace);
 		$namespace = ltrim($namespace, '/');
 
 		return str_replace('/', DIRECTORY_SEPARATOR, $namespace);
 	}
 
-	protected function getHandleForFile(string $filename, string $mode = 'r')
+	protected function getHandleForFile(string $filename = 'input', string $mode = 'r')
 	{
 		return fopen($this->getFilePath($filename), $mode);
 	}
