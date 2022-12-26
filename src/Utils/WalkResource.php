@@ -12,6 +12,7 @@ trait WalkResource
 	 *
 	 * @param $resource
 	 * @param callable $callback
+	 * @param bool $trim
 	 * @return void
 	 */
 	protected function walkResourceWithCallback($resource, callable $callback, bool $trim = true)
