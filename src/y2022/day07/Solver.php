@@ -17,16 +17,18 @@ class Solver extends DayPuzzle
 	use WalkResource;
 
 	protected array $structure = [
-		'/' => [
+		'root' => [
 			'parent' => '',
 			'children' => [],
 			'size' => 0,
 		]
 	];
 
+	protected string $currentDir = '';
+
 	protected array $dirStack = [];
 
-	protected string $currentDir = '';
+	protected bool $listing = false;
 
 	public function runTests()
 	{
@@ -46,22 +48,21 @@ class Solver extends DayPuzzle
 
 	protected function part1Logic($input)
 	{
-		$listing = false;
 		$this->walkResourceWithCallback(
 			$input,
-			function($line) use (&$listing) {
+			function($line) {
 				if (str_starts_with($line, '$')) {
-					$listing = false;
+					$this->listing = false;
 				}
 
 				if ('$ cd /' === $line) {
-					$this->dirStack = [];
-					$this->currentDir = '/';
+					$this->currentDir = 'root';
+					$this->dirStack = ['root'];
 					return;
 				}
 
 				if ('$ ls' === $line) {
-					$listing = true;
+					$this->listing = true;
 					return;
 				}
 
@@ -72,42 +73,45 @@ class Solver extends DayPuzzle
 						$this->currentDir = $this->structure[$this->currentDir]['parent'];
 					} else {
 						$this->currentDir = $this->hashDir($dirName);
+						$this->dirStack[] = $dirName;
 					}
 					return;
 				}
 
-				if ($listing) {
-					if (str_starts_with($line, 'dir')) {
-						// figure out the directory name
-						[, $dirName] = explode(' ', $line);
+				if (!$this->listing) {
+					return;
+				}
 
-						// hash to prevent duplicate names
-						$hashed = $this->hashDir($dirName);
-						if (array_key_exists($hashed, $this->structure)) {
-							throw new Exception("You're in trouble, duplicate hash found");
-						}
+				if (str_starts_with($line, 'dir')) {
+					// figure out the directory name
+					[, $dirName] = explode(' ', $line);
 
-						// add to the structure, including the parent hash
-						$this->structure[$hashed] = [
-							'parent' => $this->currentDir,
-							'children' => [],
-							'size' => 0,
-						];
-
-						$this->structure[$this->currentDir]['children'][] = $dirName;
-					} else {
-						[$size, $name] = explode(' ', $line);
-						$size = (int) $size;
-						$this->structure[$this->currentDir]['children'][$name] = $size;
-						$this->structure[$this->currentDir]['size'] += $size;
+					// hash to prevent duplicate names
+					$hashed = $this->hashDir($dirName);
+					if (array_key_exists($hashed, $this->structure)) {
+						throw new Exception("You're in trouble, duplicate hash found");
 					}
+
+					// add to the structure, including the parent hash
+					$this->structure[$hashed] = [
+						'parent' => $this->currentDir,
+						'children' => [],
+						'size' => 0,
+					];
+
+					$this->structure[$this->currentDir]['children'][] = $dirName;
+				} else {
+					[$size, $name] = explode(' ', $line);
+					$size = (int) $size;
+					$this->structure[$this->currentDir]['children'][$name] = $size;
+					$this->structure[$this->currentDir]['size'] += $size;
 				}
 			}
 		);
 
 		// Add child directory sizes to all parents.
 		foreach ($this->structure as $directory => $data) {
-			if ('/' === $directory) {
+			if ('root' === $directory) {
 				continue;
 			}
 
@@ -115,7 +119,7 @@ class Solver extends DayPuzzle
 				$this->structure[$data['parent']]['size'] += $data['size'];
 				$current = $data['parent'];
 				$data = $this->structure[$current];
-			} while ('/' !== $current);
+			} while ('root' !== $current);
 		}
 
 		$sizes = [];
@@ -126,7 +130,7 @@ class Solver extends DayPuzzle
 		$sizes = array_filter(
 			$sizes,
 			function($item) {
-				return $item < 100000;
+				return $item <= 100000;
 			}
 		);
 
@@ -136,7 +140,8 @@ class Solver extends DayPuzzle
 	protected function hashDir(string $dirName): string
 	{
 		$path = str_replace('//', '/', sprintf('/%s', join('/', $this->dirStack)));
-		return md5("{$path}/{$dirName}");
+		$fullPath = "{$path}/{$dirName}";
+		return md5($fullPath);
 	}
 
 	protected function part2Logic($input)
