@@ -31,6 +31,7 @@ class Solver extends DayPuzzle
 
 	protected function part2()
 	{
+		$this->part2Logic($this->getInput());
 	}
 
 	protected function part1Logic(array $input)
@@ -121,6 +122,77 @@ class Solver extends DayPuzzle
 
 	protected function part2Logic($input)
 	{
+		$this->setMap(new Map($input));
+		$lastColumnIndex = $this->map->getLastColumnIndex();
+		$lastRowIndex = $this->map->getLastRowIndex();
+
+		$current = [
+			'row' => 0,
+			'column' => 0,
+		];
+
+		$bestScore = 0;
+		do {
+			// Outside trees will result in a zero score.
+			if ($current['row'] === 0) {
+				$current['row']++;
+				continue;
+			}
+
+			if ($current['row'] === $lastRowIndex) {
+				break;
+			}
+
+			// Handle each column.
+			while ($current['column'] <= $lastColumnIndex) {
+				$treeHeight = $this->map->getValue(new Point(...array_values($current)));
+				if ($current['column'] === 0 || $current['column'] === $lastColumnIndex) {
+					$current['column']++;
+					continue;
+				}
+
+				// Get each array of directions.
+				$distances = [];
+				$currentColumn = array_column($input, $current['column']);
+				$directions = [
+					'west' =>array_reverse(array_slice($input[$current['row']], 0, $current['column'])),
+					'east' => array_slice($input[$current['row']], $current['column'] + 1),
+					'north' => array_reverse(array_slice($currentColumn, 0, $current['row'])),
+					'south' => array_slice($currentColumn, $current['row'] + 1),
+				];
+
+				// See how many trees can be visited in each direction.
+				foreach ($directions as $direction => $values) {
+					$index = 0;
+					foreach ($values as $index => $height) {
+						if ($height >= $treeHeight) {
+							break;
+						}
+					}
+
+					$distances[$direction] = $index + 1;
+				}
+
+				$score = array_reduce(
+					$distances,
+					function($carry, $value) {
+						return $carry * $value;
+					},
+					1
+				);
+
+				if ($score > $bestScore) {
+					$bestScore = $score;
+				}
+
+				$current['column']++;
+			}
+
+			$current['row']++;
+			$current['column'] = 0;
+		} while (true);
+
+		printf("The best score is: %d\n", $bestScore);
 	}
 
 	protected function getInput(string $filename = 'input'): array
