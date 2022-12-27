@@ -22,20 +22,6 @@ class Solver extends DayPuzzle
 		$data = $this->getInput('test');
 		$this->part1Logic($data);
 		$this->part2Logic($data);
-
-		$test1 = [];
-		for ($i=0; $i < 10; $i++) {
-			$test1[] = array_fill(0, 10, $i);
-		}
-
-		$this->part1Logic($test1);
-
-		$test2 = [];
-		for ($i = 0; $i < 10; $i++) {
-			$test2[] = range(0, 9);
-		}
-
-		$this->part1Logic($test2);
 	}
 
 	protected function part1()
@@ -54,106 +40,79 @@ class Solver extends DayPuzzle
 		$lastRowIndex = $this->map->getLastRowIndex();
 
 		// Count the number of visible trees.
-		$current = [0, 0];
+		$current = [
+			'row' => 0,
+			'column' => 0,
+		];
+
 		$counts = [];
 		$rowCount = 0;
 		do {
-			// Handle the first and last row with no extra logic
-			if ($current[0] === 0) {
-				$counts[0] = $this->map->getColumnCount();
-				$current[0]++;
+			// All outside trees are visible. Handle first and last row and continue.
+			if ($current['row'] === 0) {
+				$counts[] = $this->map->getColumnCount();
+				$current['row']++;
 				continue;
 			}
 
-			if ($current[0] === $lastRowIndex) {
-				$counts[$lastRowIndex] = $this->map->getColumnCount();
+			if ($current['row'] === $lastRowIndex) {
+				$counts[] = $this->map->getColumnCount();
 				break;
 			}
 
 			// Handle each column.
-			while ($current[1] <= $lastColumnIndex) {
-				$treeHeight = $this->map->getValue(new Point(...$current));
-				if ($current[1] === 0 || $current[1] === $lastColumnIndex) {
+			while ($current['column'] <= $lastColumnIndex) {
+				$treeHeight = $this->map->getValue(new Point(...array_values($current)));
+				if ($current['column'] === 0 || $current['column'] === $lastColumnIndex) {
 					$rowCount++;
-				} elseif ($treeHeight === 0) {
-					$current[1]++;
+					$current['column']++;
 					continue;
-				} else {
-					// look west
-					$looking = $current;
-					do {
-						$looking[1]--;
-
-						// If a tree is taller or the same height, this one isn't visible, break out of this loop.
-						if ($treeHeight <= $this->map->getValue(new Point(...$looking))) {
-							break;
-						}
-
-						// If we've gotten to the edge, the inner tree is taller than the rest.
-						if ($looking[1] === 0) {
-							$rowCount++;
-							$current[1]++;
-							continue 2;
-						}
-					} while (true);
-
-					// look north
-					$looking = $current;
-					do {
-						$looking[0]--;
-						// If a tree is taller or the same height, this one isn't visible, break out of this loop.
-						if ($treeHeight <= $this->map->getValue(new Point(...$looking))) {
-							break;
-						}
-
-						// If we've gotten to the edge, the inner tree is taller than the rest.
-						if ($looking[0] === 0) {
-							$rowCount++;
-							$current[1]++;
-							continue 2;
-						}
-					} while (true);
-
-					// look east
-					$looking = $current;
-					do {
-						$looking[1]++;
-						// If a tree is taller or the same height, this one isn't visible, break out of this loop.
-						if ($treeHeight <= $this->map->getValue(new Point(...$looking))) {
-							break;
-						}
-
-						// If we've gotten to the edge, the inner tree is taller than the rest.
-						if ($looking[1] === $lastColumnIndex) {
-							$rowCount++;
-							$current[1]++;
-							continue 2;
-						}
-					} while (true);
-
-					// look south
-					$looking = $current;
-					do {
-						$looking[0]++;
-						// If a tree is taller or the same height, this one isn't visible, break out of this loop.
-						if ($treeHeight < $this->map->getValue(new Point(...$looking))) {
-							break;
-						}
-
-						// If we've gotten to the edge, the inner tree is taller than the rest.
-						if ($looking[0] === $lastRowIndex) {
-							$rowCount++;
-							$current[1]++;
-							continue 2;
-						}
-					} while (true);
 				}
-				$current[1]++;
+
+				if ($treeHeight === 0) {
+					$current['column']++;
+					continue;
+				}
+
+				// Look west.
+				$west = array_slice($input[$current['row']], 0, $current['column']);
+				if (max($west) < $treeHeight) {
+					$rowCount++;
+					$current['column']++;
+					continue;
+				}
+
+				// Look east.
+				$east = array_slice($input[$current['row']], $current['column'] + 1);
+				if (max($east) < $treeHeight) {
+					$rowCount++;
+					$current['column']++;
+					continue;
+				}
+
+				// Look north.
+				$currentColumn = array_column($input, $current['column']);
+				$north = array_slice($currentColumn, 0, $current['row']);
+				if (max($north) < $treeHeight) {
+					$rowCount++;
+					$current['column']++;
+					continue;
+				}
+
+				// Look south.
+				$south = array_slice($currentColumn, $current['row'] + 1);
+				if (max($south) < $treeHeight) {
+					$rowCount++;
+					$current['column']++;
+					continue;
+				}
+
+				$current['column']++;
 			}
 
-			$counts[$current[0]] = $rowCount;
-			$current[0]++;
-			$current[1] = 0;
+			$counts[] = $rowCount;
+			$current['row']++;
+			$current['column'] = 0;
 			$rowCount = 0;
 		} while (true);
 
@@ -162,10 +121,9 @@ class Solver extends DayPuzzle
 
 	protected function part2Logic($input)
 	{
-
 	}
 
-	protected function getInput(string $filename = 'input')
+	protected function getInput(string $filename = 'input'): array
 	{
 		return array_map(
 			function($value) {
