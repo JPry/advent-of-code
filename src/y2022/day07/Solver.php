@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace JPry\AdventOfCode\y2022\day07;
@@ -16,69 +17,68 @@ class Solver extends DayPuzzle
 {
 	use WalkResource;
 
-	protected array $structure = [
+	protected array $s = [
 		'root' => [
 			'parent' => '',
 			'children' => [],
 			'size' => 0,
-		]
+		],
 	];
 
-	protected string $currentDir = '';
+	protected string $cwd = '';
 
-	protected array $dirStack = [];
+	protected array $stack = [];
 
-	protected bool $listing = false;
+	protected int $totalSpace = 70000000;
+
+	protected int $freeSpaceNeeded = 30000000;
 
 	public function runTests()
 	{
 		$data = $this->getHandleForFile('test');
 		$this->part1Logic($data);
-		$this->part2Logic($data);
+		$this->part2Logic();
 	}
 
 	protected function part1()
 	{
-		$this->part1Logic($this->getHandleForFile('input'));
+		$this->part1Logic($this->getHandleForFile());
 	}
 
 	protected function part2()
 	{
+		$this->part2Logic();
 	}
 
 	protected function part1Logic($input)
 	{
 		$this->walkResourceWithCallback(
 			$input,
-			function($line) {
-				if (str_starts_with($line, '$')) {
-					$this->listing = false;
-				}
-
+			function ($line) {
 				if ('$ cd /' === $line) {
-					$this->currentDir = 'root';
-					$this->dirStack = ['root'];
+					$this->cwd = 'root';
+					$this->stack = ['root'];
 					return;
 				}
 
 				if ('$ ls' === $line) {
-					$this->listing = true;
 					return;
 				}
 
 				if (str_starts_with($line, '$ cd')) {
-					[,, $dirName] = explode(' ', $line);
+					[, , $dirName] = explode(' ', $line);
 					if ('..' === $dirName) {
-						array_pop($this->dirStack);
-						$this->currentDir = $this->structure[$this->currentDir]['parent'];
-					} else {
-						$this->currentDir = $this->hashDir($dirName);
-						$this->dirStack[] = $dirName;
-					}
-					return;
-				}
+						// We're done reading this directory, add its size to its parent.
+						$parent = $this->s[$this->cwd]['parent'];
+						$this->s[$parent]['size'] += $this->s[$this->cwd]['size'];
 
-				if (!$this->listing) {
+						// Adjust the directory stack and current directory.
+						array_pop($this->stack);
+						$this->cwd = $parent;
+					} else {
+						$this->cwd = $this->getFullPath($dirName);
+						$this->stack[] = $dirName;
+					}
 					return;
 				}
 
@@ -87,49 +87,35 @@ class Solver extends DayPuzzle
 					[, $dirName] = explode(' ', $line);
 
 					// hash to prevent duplicate names
-					$hashed = $this->hashDir($dirName);
-					if (array_key_exists($hashed, $this->structure)) {
-						throw new Exception("You're in trouble, duplicate hash found");
+					$fullPath = $this->getFullPath($dirName);
+					if (array_key_exists($fullPath, $this->s)) {
+						throw new Exception("You're in trouble, duplicate path found");
 					}
 
 					// add to the structure, including the parent hash
-					$this->structure[$hashed] = [
-						'parent' => $this->currentDir,
+					$this->s[$fullPath] = [
+						'parent' => $this->cwd,
 						'children' => [],
 						'size' => 0,
+						'addedChildren' => false,
 					];
 
-					$this->structure[$this->currentDir]['children'][] = $dirName;
+					$this->s[$this->cwd]['children'][] = $dirName;
 				} else {
 					[$size, $name] = explode(' ', $line);
 					$size = (int) $size;
-					$this->structure[$this->currentDir]['children'][$name] = $size;
-					$this->structure[$this->currentDir]['size'] += $size;
+					$this->s[$this->cwd]['children'][$name] = $size;
+					$this->s[$this->cwd]['size'] += $size;
 				}
 			}
 		);
 
-		// Add child directory sizes to all parents.
-		foreach ($this->structure as $directory => $data) {
-			if ('root' === $directory) {
-				continue;
-			}
-
-			do {
-				$this->structure[$data['parent']]['size'] += $data['size'];
-				$current = $data['parent'];
-				$data = $this->structure[$current];
-			} while ('root' !== $current);
-		}
-
-		$sizes = [];
-		foreach ($this->structure as $directory => $data) {
-			$sizes[$directory] = $data['size'];
-		}
+		// Add the final directory to its parent.
+		$this->s[$this->s[$this->cwd]['parent']]['size'] += $this->s[$this->cwd]['size'];
 
 		$sizes = array_filter(
-			$sizes,
-			function($item) {
+			array_column($this->s, 'size'),
+			function ($item) {
 				return $item <= 100000;
 			}
 		);
@@ -137,16 +123,42 @@ class Solver extends DayPuzzle
 		printf("Largest sizes: %d\n", array_sum($sizes));
 	}
 
-	protected function hashDir(string $dirName): string
+	protected function getFullPath(string $dirName): string
 	{
-		$path = str_replace('//', '/', sprintf('/%s', join('/', $this->dirStack)));
-		$fullPath = "{$path}/{$dirName}";
-		return md5($fullPath);
+		$path = sprintf('/%s', join('/', $this->stack));
+
+		return "{$path}/{$dirName}";
 	}
 
-	protected function part2Logic($input)
+	/**
+	 * This assumes part 1 has already been run.
+	 *
+	 * @return void
+	 */
+	protected function part2Logic()
 	{
+		$sizes = array_combine(
+			array_keys($this->s),
+			array_column($this->s, 'size')
+		);
 
+		$totalUsed = $this->s['root']['size'];
+		printf("\nSpaced used: %s\n", number_format($totalUsed));
+
+		$freeSpace = $this->totalSpace - $totalUsed;
+		printf("Space free: %s\n", number_format($freeSpace));
+
+		$spaceNeeded = $this->freeSpaceNeeded - $freeSpace;
+		printf("Space still needed: %s\n", number_format($spaceNeeded));
+
+		$filteredSizes = array_filter(
+			$sizes,
+			function ($item) use ($spaceNeeded) {
+				return $item >= $spaceNeeded;
+			}
+		);
+
+		printf("The smallest directory able to free enough space is: %d\n", min($filteredSizes));
 	}
 
 	protected function getNamespace(): string
