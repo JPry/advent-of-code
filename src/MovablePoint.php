@@ -45,6 +45,16 @@ class MovablePoint extends Point
 		}
 	}
 
+	public function moveRow(int $distance)
+	{
+		$this->row += $distance;
+	}
+
+	public function moveColumn(int $distance)
+	{
+		$this->column += $distance;
+	}
+
 	public function updateRow(int $newRow)
 	{
 		$this->row = $newRow;
