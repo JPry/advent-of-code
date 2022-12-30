@@ -42,7 +42,6 @@ class Solver extends DayPuzzle
 		}
 
 
-
 		$data = $this->getHandleForFile('test');
 		$this->part1Logic($data);
 		$this->part2Logic($data);
@@ -50,7 +49,7 @@ class Solver extends DayPuzzle
 
 	protected function part1()
 	{
-		$this->part1Logic($this->getHandleForFile('input'));
+		$this->part1Logic($this->getHandleForFile());
 	}
 
 	protected function part2()
@@ -64,59 +63,33 @@ class Solver extends DayPuzzle
 	protected function part1Logic($input)
 	{
 		// We need to track the head and tail of the rope.
-		$this->head = new MovablePoint(4,0);
-		$this->tail = new MovablePoint(4,0);
+		$this->head = new MovablePoint(24, 24);
+		$this->tail = new MovablePoint(24, 24);
 
 		// We need to track where the tail has been.
 
 		// Let's start with a 20x20 grid.
 		$this->map = array_fill(
 			0,
-			5,
-			array_fill(0, 5, 0)
+			50,
+			array_fill(0, 50, 0)
 		);
 
-		// We start at 0,0, so mark that as being visited
-		$this->map[4][0] = 1;
+		// We start at 4,0, so mark that as being visited
+		$this->map[24][24] = 1;
+
+		$lineNumber = 0;
 
 		// We need to work through each line.
 		$this->walkResourceWithCallback(
 			$input,
-			function($line) {
+			function ($line) use (&$lineNumber) {
+				$lineNumber++;
 				[$direction, $distance] = explode(' ', $line);
 				$distance = (int) $distance;
 
 				// See if we have enough room to move, and expand the map if necessary.
-				switch ($direction) {
-					case 'L':
-						$difference = $this->head->column - $distance;
-						if ($difference < 0) {
-							// Add more columns to the left
-							$this->addColumns('before', abs($difference));
-						}
-						break;
-
-					case 'R':
-						$difference = $this->head->column + $distance;
-						if ($difference > count($this->map[0])) {
-							$this->addColumns('after', $difference - count($this->map[0]));
-						}
-						break;
-
-					case 'U':
-						$difference = $this->head->row - $distance;
-						if ($difference < 0) {
-							$this->addRows('before', abs($difference));
-						}
-						break;
-
-					case 'D':
-						$difference = $this->head->row + $distance;
-						if ($difference > count($this->map)) {
-							$this->addRows('after', $difference - count($this->map));
-						}
-						break;
-				}
+				$this->maybeAdjustMap($direction, $distance);
 
 				// Do the moving.
 				while ($distance > 0) {
@@ -139,7 +112,7 @@ class Solver extends DayPuzzle
 
 		$sum = array_sum(
 			array_map(
-				function($array) {
+				function ($array) {
 					return array_sum($array);
 				},
 				$this->map
@@ -151,34 +124,117 @@ class Solver extends DayPuzzle
 
 	protected function maybeMoveTail()
 	{
-		$rowDifference = $this->head->row - $this->tail->row;
-		$columnDifference = $this->head->column - $this->tail->column;
+		$this->maybeMoveTailHorizontally();
+		$this->maybeMoveTailVertically();
+		$this->maybeMoveTailDiagonally();
+		$this->markVisited($this->tail);
+	}
 
-		$rowAbs = abs($rowDifference);
-		$columnAbs = abs($columnDifference);
-		$needsMoved = $rowAbs > 1 || $columnAbs > 1;
-		if (!$needsMoved) {
+	protected function maybeMoveTailHorizontally()
+	{
+		// If not in the same row, skip.
+		if ($this->head->row !== $this->tail->row) {
 			return;
 		}
 
-		// It needs moved, now figure out which way.
-		$rowMove = $this->tail->row + $rowDifference;
-		if ($rowAbs > 1 || $columnDifference === 0) {
-			$rowMove += $this->tail->row <=> $this->head->row;
+		// If the distance is less than 2 in either direction, no move needed.
+		// This also covers when they're in the same spot.
+		if (abs($this->head->column - $this->tail->column) < 2) {
+			return;
 		}
 
-		$columnMove = $this->tail->column + $columnDifference;
-		if ($columnAbs > 1 || $rowDifference === 0) {
-			$columnMove += $this->tail->column <=> $this->head->column;
+		$this->tail->moveColumn($this->head->column <=> $this->tail->column);
+	}
+
+	protected function maybeMoveTailVertically()
+	{
+		// If not in the same column, skip.
+		if ($this->head->column !== $this->tail->column) {
+			return;
 		}
-		$this->tail->updateRow($rowMove);
-		$this->tail->updateColumn($columnMove);
-		$this->markVisited($this->tail);
+
+		// If the distance is less than 2 in either direction, no move needed.
+		// This also covers when they're in the same spot.
+		if (abs($this->head->row - $this->tail->row) < 2) {
+			return;
+		}
+
+		$this->tail->moveRow($this->head->row <=> $this->tail->row);
+	}
+
+	protected function maybeMoveTailDiagonally()
+	{
+		$h = &$this->head;
+		$t = &$this->tail;
+
+		// If this is the same row or column, skip.
+		if ($h->row === $t->row || $h->column === $t->column) {
+			return;
+		}
+
+		/*
+		 * Move up/right
+		 *
+		 * Scenarios:
+		 * - Tail is one column behind, 2 rows ahead (head moving up)
+		 * - Tail is one row ahead, 2 columns behind (head moving right)
+		 */
+		if (
+			($t->row - $h->row === 2 && $h->column - $t->column === 1)
+			|| ($t->row - $h->row === 1 && $h->column - $t->column === 2)
+		) {
+			$t->moveRow(-1);
+			$t->moveColumn(1);
+		}
+
+		/*
+		 * Move up/left
+		 *
+		 * Scenarios:
+		 * - Tail is one column ahead, 2 rows ahead (head moving up)
+		 * - Tail is one row ahead, 2 columns ahead (head moving left)
+		 */
+		if (
+			($t->row - $h->row === 2 && $t->column - $h->column === 1)
+			|| ($t->row - $h->row === 1 && $t->column - $h->column === 2)
+		) {
+			$t->moveRow(-1);
+			$t->moveColumn(-1);
+		}
+
+		/*
+		 * Move down/right
+		 *
+		 * Scenarios:
+		 * - Tail is one column behind, 2 rows behind (head moving down)
+		 * - Tail is two columns behind, 1 row behind (head moving right)
+		 */
+		if (
+			($h->row - $t->row === 2 && $h->column - $t->column === 1)
+			|| ($h->row - $t->row === 1 && $h->column - $t->column === 2)
+		) {
+			$t->moveRow(1);
+			$t->moveColumn(1);
+		}
+
+		/*
+		 * Move down/left
+		 *
+		 * Scenarios:
+		 * - Tail is one column ahead, 2 rows behind (head moving down)
+		 * - Tail is two columns ahead, 1 row behind (head moving left)
+		 */
+		if (
+			($h->row - $t->row === 2 && $t->column - $h->column === 1)
+			|| ($h->row - $t->row === 1 && $t->column - $h->column === 2)
+		) {
+			$t->moveRow(1);
+			$t->moveColumn(-1);
+		}
 	}
 
 	protected function part2Logic($input)
 	{
-
 	}
 
 	protected function addRows(string $where, int $number)
@@ -194,8 +250,8 @@ class Solver extends DayPuzzle
 		switch ($where) {
 			case 'before':
 				array_unshift($this->map, ...$newRows);
-				$this->head->updateRow($this->head->row + $number);
-				$this->tail->updateRow($this->tail->row + $number);
+				$this->head->moveRow($number);
+				$this->tail->moveRow($number);
 				break;
 
 			case 'after':
@@ -215,8 +271,6 @@ class Solver extends DayPuzzle
 			switch ($where) {
 				case 'before':
 					$row = array_merge($newColumns, $row);
-					$this->head->updateColumn($this->head->column + $number);
-					$this->tail->updateColumn($this->tail->column + $number);
 					break;
 
 				case 'after':
@@ -227,14 +281,104 @@ class Solver extends DayPuzzle
 					throw new Exception('Stop it, go to sleep');
 			}
 		}
+
+		if ('before' === $where) {
+			$this->head->moveColumn($number);
+			$this->tail->moveColumn($number);
+		}
+	}
+
+	/**
+	 * @param int $distance
+	 * @return void
+	 * @throws Exception
+	 */
+	protected function maybeAddColumnsBefore(int $distance)
+	{
+		$difference = $this->head->column - $distance;
+		if ($difference < 0) {
+			// Add more columns to the left
+			$this->addColumns('before', abs($difference));
+		}
+	}
+
+	/**
+	 * @param int $distance
+	 * @return void
+	 * @throws Exception
+	 */
+	protected function maybeAddColumnsAfter(int $distance)
+	{
+		$difference = $this->head->column + $distance;
+		if ($difference > count($this->map[0])) {
+			$this->addColumns('after', $difference - count($this->map[0]));
+		}
+	}
+
+	/**
+	 * @param int $distance
+	 * @return void
+	 * @throws Exception
+	 */
+	function maybeAddRowsBefore(int $distance): void
+	{
+		$difference = $this->head->row - $distance;
+		if ($difference < 0) {
+			$this->addRows('before', abs($difference));
+		}
+	}
+
+	/**
+	 * @param int $distance
+	 * @return void
+	 * @throws Exception
+	 */
+	function maybeAddRowsAfter(int $distance): void
+	{
+		$difference = $this->head->row + $distance;
+		$lastIndex = count($this->map) - 1;
+		if ($difference > $lastIndex) {
+			$this->addRows('after', $difference - $lastIndex);
+		}
+	}
+
+	/**
+	 * @param $direction
+	 * @param int $distance
+	 * @return void
+	 * @throws Exception
+	 */
+	function maybeAdjustMap($direction, int $distance): void
+	{
+		switch ($direction) {
+			case 'L':
+				$this->maybeAddColumnsBefore($distance);
+				break;
+
+			case 'R':
+				$this->maybeAddColumnsAfter($distance);
+				break;
+
+			case 'U':
+				$this->maybeAddRowsBefore($distance);
+				break;
+
+			case 'D':
+				$this->maybeAddRowsAfter($distance);
+				break;
+		}
 	}
 
 	/**
 	 * @param Point $point
 	 * @return void
+	 * @throws Exception
 	 */
 	protected function markVisited(Point $point)
 	{
+		if (!array_key_exists($point->row, $this->map)) {
+			throw new Exception("That place doesn't exist...");
+		}
 		$this->map[$point->row][$point->column] = 1;
 	}
 
