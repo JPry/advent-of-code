@@ -25,6 +25,11 @@ class Solver extends DayPuzzle
 
 	protected ?MovablePoint $tail;
 
+	protected ?MovablePoint $start;
+
+	/** @var MovablePoint[] */
+	protected array $knots = [];
+
 	public function runTests()
 	{
 		$fileData = $this->getFileAsArray();
@@ -41,10 +46,8 @@ class Solver extends DayPuzzle
 			}
 		}
 
-
-		$data = $this->getHandleForFile('test');
-		$this->part1Logic($data);
-		$this->part2Logic($data);
+		$this->part1Logic($this->getHandleForFile('test'));
+		$this->part1Logic($this->getHandleForFile('test'), 10);
 	}
 
 	protected function part1()
@@ -54,19 +57,30 @@ class Solver extends DayPuzzle
 
 	protected function part2()
 	{
+		$this->part1Logic($this->getHandleForFile(), 10);
 	}
 
 	/**
 	 * @param resource $input
+	 * @param int $totalKnots
 	 * @return void
+	 * @throws Exception
 	 */
-	protected function part1Logic($input)
+	protected function part1Logic($input, int $totalKnots = 2)
 	{
-		// We need to track the head and tail of the rope.
-		$this->head = new MovablePoint(24, 24);
-		$this->tail = new MovablePoint(24, 24);
+		// Set the starting point.
+		$this->start = new MovablePoint(20, 20);
 
-		// We need to track where the tail has been.
+		// We need to track the head and tail of the rope.
+		$this->head = clone $this->start;
+		$this->tail = clone $this->start;
+
+		// Build the array of knots
+		$this->knots = [];
+		for ($i = 2; $i < $totalKnots; $i++) {
+			$this->knots[] = clone $this->start;
+		}
+		$this->knots[] = $this->tail;
 
 		// Let's start with a 20x20 grid.
 		$this->map = array_fill(
@@ -75,8 +89,8 @@ class Solver extends DayPuzzle
 			array_fill(0, 50, 0)
 		);
 
-		// We start at 4,0, so mark that as being visited
-		$this->map[24][24] = 1;
+		// Mark the start as being visited.
+		$this->markVisited($this->start);
 
 		$lineNumber = 0;
 
@@ -97,19 +111,16 @@ class Solver extends DayPuzzle
 					$this->head->{$direction}(1);
 
 					// Maybe move the tail
-					$this->maybeMoveTail();
+					$this->maybeMoveKnots();
 					$distance--;
 				}
 			}
 		);
 
-//		foreach ($this->map as $row) {
-//			foreach ($row as $column) {
-//				echo $column === 1 ? '#' : '.';
-//			}
-//			echo "\n";
-//		}
+		// Render at the end
+		$this->writePositionsToFile($totalKnots);
 
+		// Add up all the places the tail visited.
 		$sum = array_sum(
 			array_map(
 				function ($array) {
@@ -122,84 +133,107 @@ class Solver extends DayPuzzle
 		printf("The tail visited %d locations\n", $sum);
 	}
 
-	protected function maybeMoveTail()
+	protected function maybeMoveKnots()
 	{
-		$this->maybeMoveTailHorizontally();
-		$this->maybeMoveTailVertically();
-		$this->maybeMoveTailDiagonally();
+		$previousKnot = $this->head;
+		foreach ($this->knots as $knot) {
+			$this->maybeMoveKnotHorizontally($knot, $previousKnot);
+			$this->maybeMoveKnotVertically($knot, $previousKnot);
+			$this->maybeMoveKnotDiagonally($knot, $previousKnot);
+			$previousKnot = $knot;
+		}
+
 		$this->markVisited($this->tail);
 	}
 
-	protected function maybeMoveTailHorizontally()
+	protected function maybeMoveKnotHorizontally(MovablePoint $knotToMove, MovablePoint $knotToFollow)
 	{
 		// If not in the same row, skip.
-		if ($this->head->row !== $this->tail->row) {
+		if ($knotToFollow->row !== $knotToMove->row) {
 			return;
 		}
 
 		// If the distance is less than 2 in either direction, no move needed.
 		// This also covers when they're in the same spot.
-		if (abs($this->head->column - $this->tail->column) < 2) {
+		if (abs($knotToFollow->column - $knotToMove->column) < 2) {
 			return;
 		}
 
-		$this->tail->moveColumn($this->head->column <=> $this->tail->column);
+		$knotToMove->moveColumn($knotToFollow->column <=> $knotToMove->column);
 	}
 
-	protected function maybeMoveTailVertically()
+	protected function maybeMoveKnotVertically(MovablePoint $knotToMove, MovablePoint $knotToFollow)
 	{
 		// If not in the same column, skip.
-		if ($this->head->column !== $this->tail->column) {
+		if ($knotToFollow->column !== $knotToMove->column) {
 			return;
 		}
 
 		// If the distance is less than 2 in either direction, no move needed.
 		// This also covers when they're in the same spot.
-		if (abs($this->head->row - $this->tail->row) < 2) {
+		if (abs($knotToFollow->row - $knotToMove->row) < 2) {
 			return;
 		}
 
-		$this->tail->moveRow($this->head->row <=> $this->tail->row);
+		$knotToMove->moveRow($knotToFollow->row <=> $knotToMove->row);
 	}
 
-	protected function maybeMoveTailDiagonally()
+	protected function maybeMoveKnotDiagonally(MovablePoint $knotToMove, MovablePoint $knotToFollow)
 	{
-		$h = &$this->head;
-		$t = &$this->tail;
-
 		// If this is the same row or column, skip.
-		if ($h->row === $t->row || $h->column === $t->column) {
+		if ($knotToFollow->row === $knotToMove->row || $knotToFollow->column === $knotToMove->column) {
 			return;
 		}
+
+		$toMoveColumnDifference = $knotToFollow->column - $knotToMove->column;
+		$toMoveRowDifference = $knotToFollow->row - $knotToMove->row;
+
+		// Primary moving directions.
+		$movingUp = -2 === $toMoveRowDifference;
+		$movingDown = 2 === $toMoveRowDifference;
+		$movingRight = 2 === $toMoveColumnDifference;
+		$movingLeft = -2 === $toMoveColumnDifference;
+
+		// Row and columns offsets.
+		$columnBehind = $toMoveColumnDifference === 1;
+		$columnAhead = $toMoveColumnDifference === -1;
+		$rowBehind = $toMoveRowDifference === 1;
+		$rowAhead = $toMoveRowDifference === -1;
 
 		/*
 		 * Move up/right
 		 *
 		 * Scenarios:
-		 * - Tail is one column behind, 2 rows ahead (head moving up)
-		 * - Tail is one row ahead, 2 columns behind (head moving right)
+		 * - Tail is 1 column behind, 2 rows ahead (head moving up)
+		 * - Tail is 2 columns behind, 2 rows ahead (head moving up/right)
+		 * - Tail is 2 columns behind, 1 row ahead (head moving right)
 		 */
 		if (
-			($t->row - $h->row === 2 && $h->column - $t->column === 1)
-			|| ($t->row - $h->row === 1 && $h->column - $t->column === 2)
+			($columnBehind && $movingUp) ||
+			($movingUp && $movingRight) ||
+			($movingRight && $rowAhead)
 		) {
-			$t->moveRow(-1);
-			$t->moveColumn(1);
+			$knotToMove->moveRow(-1);
+			$knotToMove->moveColumn(1);
+			return;
 		}
 
 		/*
 		 * Move up/left
 		 *
 		 * Scenarios:
-		 * - Tail is one column ahead, 2 rows ahead (head moving up)
-		 * - Tail is one row ahead, 2 columns ahead (head moving left)
+		 * - Tail is 1 column ahead, 2 rows ahead (head moving up)
+		 * - Tail is 2 columns ahead, 2 rows ahead (head moving up/left)
+		 * - Tail is 2 columns ahead, 1 row ahead (head moving left)
 		 */
 		if (
-			($t->row - $h->row === 2 && $t->column - $h->column === 1)
-			|| ($t->row - $h->row === 1 && $t->column - $h->column === 2)
+			($columnAhead && $movingUp) ||
+			($movingUp && $movingLeft) ||
+			($movingLeft && $rowAhead)
 		) {
-			$t->moveRow(-1);
-			$t->moveColumn(-1);
+			$knotToMove->moveRow(-1);
+			$knotToMove->moveColumn(-1);
+			return;
 		}
 
 		/*
@@ -210,11 +244,13 @@ class Solver extends DayPuzzle
 		 * - Tail is two columns behind, 1 row behind (head moving right)
 		 */
 		if (
-			($h->row - $t->row === 2 && $h->column - $t->column === 1)
-			|| ($h->row - $t->row === 1 && $h->column - $t->column === 2)
+			($columnBehind && $movingDown) ||
+			($movingDown && $movingRight) ||
+			($movingRight && $rowBehind)
 		) {
-			$t->moveRow(1);
-			$t->moveColumn(1);
+			$knotToMove->moveRow(1);
+			$knotToMove->moveColumn(1);
+			return;
 		}
 
 		/*
@@ -225,11 +261,12 @@ class Solver extends DayPuzzle
 		 * - Tail is two columns ahead, 1 row behind (head moving left)
 		 */
 		if (
-			($h->row - $t->row === 2 && $t->column - $h->column === 1)
-			|| ($h->row - $t->row === 1 && $t->column - $h->column === 2)
+			($columnAhead && $movingDown) ||
+			($movingDown && $movingLeft) ||
+			($movingLeft && $rowBehind)
 		) {
-			$t->moveRow(1);
-			$t->moveColumn(-1);
+			$knotToMove->moveRow(1);
+			$knotToMove->moveColumn(-1);
 		}
 	}
 
@@ -251,7 +288,10 @@ class Solver extends DayPuzzle
 			case 'before':
 				array_unshift($this->map, ...$newRows);
 				$this->head->moveRow($number);
-				$this->tail->moveRow($number);
+				$this->start->moveRow($number);
+				foreach ($this->knots as $knot) {
+					$knot->moveRow($number);
+				}
 				break;
 
 			case 'after':
@@ -284,7 +324,10 @@ class Solver extends DayPuzzle
 
 		if ('before' === $where) {
 			$this->head->moveColumn($number);
-			$this->tail->moveColumn($number);
+			$this->start->moveColumn($number);
+			foreach ($this->knots as $knot) {
+				$knot->moveColumn($number);
+			}
 		}
 	}
 
@@ -385,5 +428,44 @@ class Solver extends DayPuzzle
 	protected function getNamespace(): string
 	{
 		return __NAMESPACE__;
+	}
+
+	/**
+	 * @param int $totalKnots
+	 * @return void
+	 */
+	protected function writePositionsToFile(int $totalKnots): void
+	{
+		$knots = $this->knots;
+
+		// Remove the tail, we'll handle that separately.
+		array_pop($knots);
+
+		// Add each element's point. These can overwrite each other on purpose.
+		$points = [];
+		foreach ($knots as $index => $knot) {
+			$points[(string) $knot] ??= $index + 1;
+		}
+
+		ob_start();
+		foreach ($this->map as $row => $columns) {
+			foreach ($columns as $column => $data) {
+				$location = "{$row},{$column}";
+				if ($this->head->row === $row && $this->head->column === $column) {
+					echo 'H';
+				} elseif ($this->tail->row === $row && $this->tail->column === $column) {
+					echo 'T';
+				} elseif ($this->start->row === $row && $this->start->column === $column) {
+					echo 'S';
+				} elseif (array_key_exists($location, $points)) {
+					echo $points[$location];
+				} else {
+					echo $data === 1 ? '#' : '.';
+				}
+			}
+			echo "\n";
+		}
+
+		file_put_contents($this->input->createFile("output-{$totalKnots}.txt"), ob_get_clean());
 	}
 }
