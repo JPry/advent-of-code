@@ -18,12 +18,6 @@ class Input
 		$this->directory = $directory;
 	}
 
-	public function getFiles(): array
-	{
-		$this->maybeFindFiles();
-		return $this->files;
-	}
-
 	public function getFile(string $basename): array
 	{
 		$this->maybeFindFiles();
@@ -34,6 +28,35 @@ class Input
 		}
 
 		return $this->files[$basename];
+	}
+
+	/**
+	 * Create a new file and return its full path.
+	 *
+	 * @param string $fileName
+	 * @return string
+	 */
+	public function createFile(string $fileName): string
+	{
+		$info = pathinfo($fileName);
+		$name = $info['filename'];
+		$extension = $info['extension'];
+		$basename = $info['basename'];
+
+		$this->maybeFindFiles();
+		if (array_key_exists($name, $this->files)) {
+			return "{$this->files[$name]['dirname']}/{$this->files[$name]['basename']}";
+		}
+
+		touch("{$this->directory->getDirectory()}/{$basename}");
+		$this->files[$name] = [
+			'basename' => $basename,
+			'dirname' => $this->directory->getDirectory(),
+			'extension' => $extension,
+			'filename' => $name,
+		];
+
+		return "{$this->files[$name]['dirname']}/{$this->files[$name]['basename']}";
 	}
 
 	private function maybeFindFiles()
