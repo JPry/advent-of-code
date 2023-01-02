@@ -22,7 +22,7 @@ class Solver extends DayPuzzle
 
 	public function runTests()
 	{
-		$this->monkeys = [
+		$monkeys = [
 			[
 				'items' => [79, 98],
 				'operation' => function ($old) {
@@ -31,6 +31,7 @@ class Solver extends DayPuzzle
 				'test' => function ($value) {
 					return ($value % 23) === 0 ? 2 : 3;
 				},
+				'mod' => 23,
 			],
 			[
 				'items' => [54, 65, 75, 74],
@@ -40,6 +41,7 @@ class Solver extends DayPuzzle
 				'test' => function ($value) {
 					return ($value % 19) === 0 ? 2 : 0;
 				},
+				'mod' => 19,
 			],
 			[
 				'items' => [79, 60, 97],
@@ -49,6 +51,7 @@ class Solver extends DayPuzzle
 				'test' => function ($value) {
 					return ($value % 13) === 0 ? 1 : 3;
 				},
+				'mod' => 13,
 			],
 			[
 				'items' => [74],
@@ -58,16 +61,113 @@ class Solver extends DayPuzzle
 				'test' => function ($value) {
 					return ($value % 17) === 0 ? 0 : 1;
 				},
+				'mod' => 17,
 			],
 		];
 //		$data = $this->splitFileByDoubleNewLine('test');
-		$this->part1Logic();
-		$this->part2Logic();
+		$this->part1Logic($monkeys);
+		$this->part2Logic($monkeys);
 	}
 
 	protected function part1()
 	{
-		$this->monkeys = [
+		$this->part1Logic($this->getMonkeys());
+	}
+
+	protected function part2()
+	{
+		$this->part2Logic($this->getMonkeys());
+	}
+
+	protected function part1Logic(array $monkeys)
+	{
+		$round = 1;
+		$inspections = [];
+		do {
+			foreach ($monkeys as $index => &$monkey) {
+				$inspections[$index] ??= 0;
+				foreach ($monkey['items'] as $item) {
+					$result = $monkey['operation']($item);
+					$result = (int) floor($result / 3);
+					$throwTo = $monkey['test']($result);
+					$monkeys[$throwTo]['items'][] = $result;
+					$inspections[$index]++;
+				}
+
+				// All of this monkey's items have been thrown.
+				$monkey['items'] = [];
+			}
+			$round++;
+		} while ($round <= 20);
+
+		rsort($inspections);
+		$result = array_reduce(
+			array_slice($inspections, 0, 2),
+			function ($carry, $item) {
+				return $carry * $item;
+			},
+			1
+		);
+
+		printf("The product is %d\n", $result);
+	}
+
+	protected function part2Logic(array $monkeys)
+	{
+		$round = 1;
+		$inspections = [];
+		$commonProduct = array_reduce(
+			array_column($monkeys, 'mod'),
+			function($carry, $item) {
+				return $carry * $item;
+			},
+			1
+		);
+
+		do {
+			foreach ($monkeys as $index => &$monkey) {
+				$inspections[$index] ??= 0;
+				foreach ($monkey['items'] as $item) {
+					// The monkey escalates worry.
+					$result = $monkey['operation']($item);
+
+					// Reduce the worry some.
+					$result = $result % $commonProduct;
+
+					$throwTo = $monkey['test']($result);
+					$monkeys[$throwTo]['items'][] = $result;
+					$inspections[$index]++;
+				}
+
+				// All of this monkey's items have been thrown.
+				$monkey['items'] = [];
+			}
+			$round++;
+		} while ($round <= 10000);
+
+		rsort($inspections);
+		$result = array_reduce(
+			array_slice($inspections, 0, 2),
+			function ($carry, $item) {
+				return $carry * $item;
+			},
+			1
+		);
+
+		printf("The product is %d\n", $result);
+	}
+
+	protected function getNamespace(): string
+	{
+		return __NAMESPACE__;
+	}
+
+	/**
+	 * @return array[]
+	 */
+	protected function getMonkeys(): array
+	{
+		return [
 			[
 				'items' => [89, 84, 88, 78, 70],
 				'operation' => function ($old) {
@@ -96,7 +196,7 @@ class Solver extends DayPuzzle
 				'test' => function ($value) {
 					return ($value % 11) === 0 ? 5 : 3;
 				},
-				'mod' =>11,
+				'mod' => 11,
 			],
 			[
 				'items' => [95, 94, 85, 57],
@@ -149,82 +249,5 @@ class Solver extends DayPuzzle
 				'mod' => 3,
 			],
 		];
-		$this->part1Logic();
-	}
-
-	protected function part2()
-	{
-		$this->part2Logic();
-	}
-
-	protected function part1Logic()
-	{
-		$round = 1;
-		$this->inspections = [];
-		do {
-			foreach ($this->monkeys as $index => &$monkey) {
-				$this->inspections[$index] ??= 0;
-				foreach ($monkey['items'] as $item) {
-					$result = $monkey['operation']($item);
-					$result = (int) floor($result / 3);
-					$throwTo = $monkey['test']($result);
-					$this->monkeys[$throwTo]['items'][] = $result;
-					$this->inspections[$index]++;
-				}
-
-				// All of this monkey's items have been thrown.
-				$monkey['items'] = [];
-			}
-			$round++;
-		} while ($round <= 20);
-
-		rsort($this->inspections);
-		$result = array_reduce(
-			array_slice($this->inspections, 0, 2),
-			function($carry, $item) {
-				return $carry * $item;
-			},
-			1
-		);
-
-		printf("The product is %d\n", $result);
-	}
-
-	protected function part2Logic()
-	{
-		$round = 1;
-		$this->inspections = [];
-		do {
-			foreach ($this->monkeys as $index => &$monkey) {
-				$this->inspections[$index] ??= 0;
-				foreach ($monkey['items'] as $item) {
-					$result = $monkey['operation']($item);
-
-					$throwTo = $monkey['test']($result);
-					$this->monkeys[$throwTo]['items'][] = $result;
-					$this->inspections[$index]++;
-				}
-
-				// All of this monkey's items have been thrown.
-				$monkey['items'] = [];
-			}
-			$round++;
-		} while ($round <= 10000);
-
-		rsort($this->inspections);
-		$result = array_reduce(
-			array_slice($this->inspections, 0, 2),
-			function($carry, $item) {
-				return $carry * $item;
-			},
-			1
-		);
-
-		printf("The product is %d\n", $result);
-	}
-
-	protected function getNamespace(): string
-	{
-		return __NAMESPACE__;
 	}
 }
