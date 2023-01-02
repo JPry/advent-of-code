@@ -112,6 +112,11 @@ class Solver extends DayPuzzle
 		printf("The product is %d\n", $result);
 	}
 
+	/**
+	 * @see https://www.reddit.com/r/adventofcode/comments/zjsi12/2022_day_11_on_the_spoiler_math_involved/
+	 * @param array $monkeys
+	 * @return void
+	 */
 	protected function part2Logic(array $monkeys)
 	{
 		$round = 1;
