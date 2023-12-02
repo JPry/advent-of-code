@@ -2,6 +2,8 @@
 
 namespace JPry\AdventOfCode;
 
+use Symfony\Component\Console\Output\OutputInterface;
+
 abstract class DayPuzzle
 {
 	/**
@@ -9,7 +11,9 @@ abstract class DayPuzzle
 	 */
 	protected ?Input $input;
 
-	public function __construct(?Input $input = null)
+	protected ?OutputInterface $output;
+
+	public function __construct(?OutputInterface $output = null, ?Input $input = null)
 	{
 		if (null === $input) {
 			$location = sprintf(
@@ -22,6 +26,18 @@ abstract class DayPuzzle
 		}
 
 		$this->input = $input;
+		$this->output = $output;
+	}
+
+	protected function writeln(...$messages)
+	{
+		if ($this->output instanceof OutputInterface) {
+			$this->output->writeln(...$messages);
+		} else {
+			foreach ($messages as $message) {
+				echo $message . PHP_EOL;
+			}
+		}
 	}
 
 	public function run()

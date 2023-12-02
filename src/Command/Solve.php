@@ -51,7 +51,7 @@ class Solve extends Command
 			$className = "{$this->getBaseNamespace()}\\y{$year}\\day{$day}\\Solver";
 
 			/** @var DayPuzzle $class */
-			$class = new $className();
+			$class = new $className($output);
 			$doTests ? $class->runTests() : $class->run();
 		}
 
