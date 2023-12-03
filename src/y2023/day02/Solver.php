@@ -29,7 +29,19 @@ class Solver extends DayPuzzle
 
 	protected function part1Logic($input)
 	{
-
+		$red = 12;
+		$green = 13;
+		$blue = 14;
+		
+		$valid = [];
+		
+		foreach ($input as $game) {
+			[$id, $details] = explode(':', $game);
+			$id = intval(preg_replace('#\D#', '', $id));
+			
+			$sets = explode(';', $details);
+		}
+		
 	}
 
 	protected function part2Logic($input)
