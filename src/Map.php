@@ -24,7 +24,7 @@ class Map
 			&& isset($this->map[$point->row][$point->column]);
 	}
 
-	public function getValue(Point $point): int
+	public function getValue(Point $point)
 	{
 		if (!$this->isValidPoint($point)) {
 			throw new RuntimeException(sprintf('Point "%s" is invalid for map.', $point));
