@@ -2,6 +2,8 @@
 
 namespace JPry\AdventOfCode\Utils;
 
+use DateTimeImmutable as DTI;
+use DateTimeZone as DTZ;
 use RuntimeException;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -19,7 +21,7 @@ trait DayArgument
 			'days',
 			InputArgument::IS_ARRAY,
 			'The day(s) of input to obtain. Cannot obtain future days',
-			[date('j')]
+			[(new DTI('now', new DTZ('America/Chicago')))->format('j')]
 		);
 	}
 
