@@ -68,4 +68,28 @@ class Map
 			}
 		}
 	}
+
+	/**
+	 * @param Point $point
+	 * @return array<Point>
+	 */
+	public function getPointsAround(Point $point): array
+	{
+		$points = [];
+		$points[] = new Point($point->row - 1, $point->column - 1);
+		$points[] = new Point($point->row - 1, $point->column);
+		$points[] = new Point($point->row - 1, $point->column + 1);
+		$points[] = new Point($point->row, $point->column - 1);
+		$points[] = new Point($point->row, $point->column + 1);
+		$points[] = new Point($point->row + 1, $point->column - 1);
+		$points[] = new Point($point->row + 1, $point->column);
+		$points[] = new Point($point->row + 1, $point->column + 1);
+
+		return array_filter(
+			$points,
+			function (Point $point) {
+				return $this->isValidPoint($point);
+			}
+		);
+	}
 }
