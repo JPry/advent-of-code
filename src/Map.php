@@ -59,4 +59,13 @@ class Map
 	{
 		return $this->lastColumnIndex;
 	}
+
+	public function walkMap(callable $callback)
+	{
+		foreach ($this->map as $rowIndex => $row) {
+			foreach ($row as $columnIndex => $value) {
+				$callback($value, $rowIndex, $columnIndex, $this);
+			}
+		}
+	}
 }
