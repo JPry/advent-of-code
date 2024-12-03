@@ -46,6 +46,31 @@ abstract class DayPuzzle
 		$this->part2();
 	}
 
+	public function returnPart1()
+	{
+		return $this->part1();
+	}
+
+	public function returnPart2()
+	{
+		return $this->part2();
+	}
+
+	public function returnTest1($input = null, $filename = 'test')
+	{
+		return $this->part1Logic($this->getTestInput($input, $filename));
+	}
+
+	public function returnTest2($input = null, $filename = 'test')
+	{
+		return $this->part2Logic($this->getTestInput($input, $filename));
+	}
+
+	protected function getTestInput($input = null, $filename = 'test')
+	{
+		return $input ?? $this->getFileAsArray($filename);
+	}
+
 	protected function convertInputNamespace()
 	{
 		$namespace = $this->getNamespace();
@@ -98,8 +123,8 @@ abstract class DayPuzzle
 	}
 
 	abstract protected function getNamespace();
-
 	abstract protected function part1();
-
 	abstract protected function part2();
+	abstract protected function part1Logic($input);
+	abstract protected function part2Logic($input);
 }
