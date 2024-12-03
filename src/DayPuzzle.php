@@ -58,15 +58,15 @@ abstract class DayPuzzle
 
 	public function returnTest1($input = null, $filename = 'test')
 	{
-		return $this->part1Logic($this->getTestInput($input, $filename));
+		return $this->part1Logic($this->getTestInputArray($input, $filename));
 	}
 
 	public function returnTest2($input = null, $filename = 'test')
 	{
-		return $this->part2Logic($this->getTestInput($input, $filename));
+		return $this->part2Logic($this->getTestInputArray($input, $filename));
 	}
 
-	protected function getTestInput($input = null, $filename = 'test')
+	protected function getTestInputArray($input = null, $filename = 'test')
 	{
 		return $input ?? $this->getFileAsArray($filename);
 	}
@@ -96,12 +96,12 @@ abstract class DayPuzzle
 	{
 	}
 
-	protected function getFileContents(string $fileName = 'input'): string
+	public function getFileContents(string $fileName = 'input'): string
 	{
 		return trim(file_get_contents($this->getFilePath($fileName)));
 	}
 
-	protected function getFileAsArray(string $filename = 'input'): array
+	public function getFileAsArray(string $filename = 'input'): array
 	{
 		return file($this->getFilePath($filename), FILE_SKIP_EMPTY_LINES | FILE_IGNORE_NEW_LINES);
 	}
