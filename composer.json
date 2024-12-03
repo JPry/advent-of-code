@@ -9,13 +9,21 @@
     ],
     "require": {
         "php": ">=8.2",
-        "symfony/console": "^5.4",
+        "symfony/console": "^7.2",
         "guzzlehttp/guzzle": "^7.5",
-        "symfony/dotenv": "^5.4"
+        "symfony/dotenv": "^7.2"
     },
     "autoload": {
         "psr-4": {
             "JPry\\AdventOfCode\\": "src/"
+        }
+    },
+    "require-dev": {
+        "pestphp/pest": "^3.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
         }
     }
 }
