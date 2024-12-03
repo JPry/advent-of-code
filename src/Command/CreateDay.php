@@ -14,11 +14,11 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Class NewTest
+ * Class CreateDay
  *
  * @since %VERSION%
  */
-class NewTest extends Command
+class CreateDay extends Command
 {
 	use BaseDir;
 	use DayArgument;
@@ -117,6 +117,19 @@ class NewTest extends Command
 
 		if ($input->getOption('download')) {
 			$command = $this->getApplication()->get('input:download');
+			$command->run(
+				new ArrayInput(
+					[
+						'days' => $days,
+						'--year' => $year,
+					]
+				),
+				$output
+			);
+		}
+
+		if ($input->getOption('add-tests')) {
+			$command = $this->getApplication()->get('create:test');
 			$command->run(
 				new ArrayInput(
 					[
