@@ -81,6 +81,92 @@ class Solver extends DayPuzzle
 
 	protected function part2Logic($input)
 	{
+		$safe = 0;
+		foreach ($input as $line) {
+			$levels = array_map('intval', explode(' ', $line));
+
+			if ($this->is_line_safe($levels)) {
+				$safe++;
+			} else {
+				$this->writeln("Unsafe line: " . implode(' ', $levels));
+			}
+		}
+
+		$this->writeln("The number of safe levels is: {$safe}");
+
+		return $safe;
+	}
+
+	protected function is_line_safe(array $levels): bool
+	{
+		static $is_trying_removal = false;
+		$last_level = null;
+		$last_diff = null;
+
+		foreach ($levels as $level) {
+			// Set up the first element and continue.
+			if (null === $last_level) {
+				$last_level = $level;
+				continue;
+			}
+
+			// Calculate the difference between the last level and this one.
+			$diff = $last_level - $level;
+			$last_level = $level;
+
+
+			$big_diff = abs($diff) > 3;
+			$no_diff = 0 === $diff;
+
+			if ($big_diff || $no_diff) {
+				// If we're already trying to remove, return false for these because
+				// we can only remove one element.
+				if ($is_trying_removal) {
+					return false;
+				}
+
+				$is_trying_removal = true;
+				$is_line_safe = $this->try_level_without_index($levels);
+				$is_trying_removal = false;
+
+				return $is_line_safe;
+			}
+
+			// If we don't have a last diff, set it and continue.
+			if (null === $last_diff) {
+				$last_diff = $diff;
+				continue;
+			}
+
+			if (($last_diff < 0 && $diff > 0) || ($last_diff > 0 && $diff < 0)) {
+				if ($is_trying_removal) {
+					return false;
+				}
+
+				// Check if either of these is safe.
+				$is_trying_removal = true;
+				$is_line_safe = $this->try_level_without_index($levels);
+				$is_trying_removal = false;
+
+				return $is_line_safe;
+			}
+		}
+
+		return true;
+	}
+
+	protected function try_level_without_index(array $levels): bool
+	{
+		// Try removing each element one by one to see if any work.
+		for ($i = 0; $i < count($levels) - 1; $i++) {
+			$copy = $levels;
+			unset($copy[$i]);
+			if ($this->is_line_safe($copy)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	protected function getNamespace(): string
