@@ -1,6 +1,7 @@
 #!/usr/bin/env php
 <?php
 
+use JPry\AdventOfCode\Command\CreateTest;
 use JPry\AdventOfCode\Command\DownloadInput;
 use JPry\AdventOfCode\Command\CreateDay;
 use JPry\AdventOfCode\Command\Solve;
@@ -17,11 +18,12 @@ if (!file_exists(dirname(__DIR__) . '/.env')) {
 	->usePutenv()
 	->load(dirname(__DIR__) . '/.env');
 
-$app = new Application('Advent of Code', '1.0.0');
+$app = new Application('JPry Advent of Code', '1.1.0');
 $app->addCommands(
 	[
 		new DownloadInput(),
 		new CreateDay(),
+		new CreateTest(),
 		new Solve(),
 	]
 );

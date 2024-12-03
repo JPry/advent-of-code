@@ -41,7 +41,8 @@ class CreateDay extends Command
 	protected function configure(): void
 	{
 		$this
-			->setName('new')
+			->setName('create:day')
+			->setAliases(['new'])
 			->setDescription('Create a new test from the template')
 			->configureDayArgument()
 			->configureYearOption()
@@ -56,7 +57,14 @@ class CreateDay extends Command
 				'd',
 				InputOption::VALUE_NONE,
 				'Whether to download the input data (if available).'
-			);
+			)
+			->addOption(
+				'add-tests',
+				't',
+				InputOption::VALUE_NONE,
+				'Whether to add tests to the test suite.'
+			)
+		;
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output): int

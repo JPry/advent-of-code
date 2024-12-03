@@ -33,4 +33,28 @@ trait BaseDir
 	{
 		return "{$this->getBaseDir()}/input";
 	}
+
+	/**
+	 * Get the base tests directory for the project.
+	 *
+	 * @return string
+	 */
+	protected function getTestsBaseDir(): string
+	{
+		return "{$this->getBaseDir()}/tests";
+	}
+
+	/**
+	 * Get the base directory for a specific year.
+	 *
+	 * @param ?int $year The year for which to get the base directory.
+	 *
+	 * @return string
+	 */
+	protected function getYearTestsBaseDir(?int $year = null): string
+	{
+		$year ??= date('Y');
+
+		return "{$this->getTestsBaseDir()}/Year{$year}";
+	}
 }
