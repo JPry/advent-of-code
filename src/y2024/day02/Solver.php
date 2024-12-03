@@ -74,8 +74,6 @@ class Solver extends DayPuzzle
 			$safe++;
 		}
 
-		$this->writeln("The number of safe levels is: {$safe}");
-
 		return $safe;
 	}
 
@@ -88,16 +86,14 @@ class Solver extends DayPuzzle
 			if ($this->is_line_safe($levels)) {
 				$safe++;
 			} else {
-				$this->writeln("Unsafe line: " . implode(' ', $levels));
+				$this->writeln("Unsafe line: {$line}");
 			}
 		}
-
-		$this->writeln("The number of safe levels is: {$safe}");
 
 		return $safe;
 	}
 
-	protected function is_line_safe(array $levels): bool
+	public function is_line_safe(array $levels): bool
 	{
 		static $is_trying_removal = false;
 		$last_level = null;
