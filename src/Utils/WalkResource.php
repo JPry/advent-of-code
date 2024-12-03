@@ -15,7 +15,7 @@ trait WalkResource
 	 * @param bool $trim
 	 * @return void
 	 */
-	protected function walkResourceWithCallback($resource, callable $callback, bool $trim = true)
+	protected function walkResourceWithCallback($resource, callable $callback, bool $trim = true): void
 	{
 		while (false !== ($line = fgets($resource))) {
 			if ($trim) {

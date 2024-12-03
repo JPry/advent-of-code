@@ -29,7 +29,7 @@ class DownloadInput extends Command
 	/**
 	 * Configures the current command.
 	 */
-	protected function configure()
+	protected function configure(): void
 	{
 		$this
 			->setName('input:download')
@@ -52,7 +52,7 @@ class DownloadInput extends Command
 	 * @throws GuzzleException When there is a problem with the request.
 	 * @see setCode()
 	 */
-	protected function execute(InputInterface $input, OutputInterface $output)
+	protected function execute(InputInterface $input, OutputInterface $output): int
 	{
 		$days = $this->normalizeDays($input->getArgument('days'));
 		$year = $input->getOption('year');

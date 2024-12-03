@@ -20,7 +20,7 @@ class Solve extends Command
 	use DayArgument;
 	use YearOption;
 
-	protected function configure()
+	protected function configure(): void
 	{
 		$this
 			->setName('solve')

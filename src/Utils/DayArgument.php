@@ -15,7 +15,7 @@ use Symfony\Component\Console\Input\InputArgument;
  */
 trait DayArgument
 {
-	protected function configureDayArgument()
+	protected function configureDayArgument(): static
 	{
 		return $this->addArgument(
 			'days',
@@ -28,14 +28,19 @@ trait DayArgument
 	/**
 	 * Adds an argument.
 	 *
-	 * @param int|null $mode The argument mode: InputArgument::REQUIRED or InputArgument::OPTIONAL
+	 * @param ?int $mode The argument mode: InputArgument::REQUIRED or InputArgument::OPTIONAL
 	 * @param mixed $default The default value (for InputArgument::OPTIONAL mode only)
 	 *
 	 * @return $this
 	 * @throws InvalidArgumentException When argument mode is not valid
 	 *
 	 */
-	abstract public function addArgument(string $name, int $mode = null, string $description = '', $default = null);
+	abstract public function addArgument(
+		string $name,
+		int $mode = null,
+		string $description = '',
+		mixed $default = null
+	): static;
 
 	/**
 	 * Normalize a day number to include leading zeros for numbers less than 10.
@@ -64,7 +69,7 @@ trait DayArgument
 		}
 
 		// Check to see if days was entered as a range.
-		if (count($days) === 1 && false !== strpos($days[0], '..')) {
+		if (count($days) === 1 && str_contains($days[0], '..')) {
 			preg_match('#(\d+)\.\.(\d+)#', $days[0], $matches);
 			if (isset($matches[1], $matches[2])) {
 				$days = range(...array_slice($matches, 1, 2));
@@ -72,7 +77,7 @@ trait DayArgument
 		}
 
 		return array_map(
-			function($value) use ($maxValue) {
+			function ($value) use ($maxValue) {
 				if ((int) $value > $maxValue) {
 					throw new RuntimeException(sprintf("One of the day values was too high. Found %s", $value));
 				}

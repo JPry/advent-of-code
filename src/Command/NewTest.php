@@ -25,7 +25,7 @@ class NewTest extends Command
 	use YearOption;
 
 	/** @var string */
-	private $baseDir;
+	private string $baseDir;
 
 	/**
 	 * @param string|null $name The name of the command; passing null means it must be set in configure()
@@ -38,7 +38,7 @@ class NewTest extends Command
 		parent::__construct($name);
 	}
 
-	protected function configure()
+	protected function configure(): void
 	{
 		$this
 			->setName('new')
@@ -89,7 +89,7 @@ class NewTest extends Command
 
 			// Create the solution files.
 			$templatePath = "{$this->baseDir}/src/y{$year}/template";
-			$dayPath      = "{$this->baseDir}/src/y{$year}/day{$day}";
+			$dayPath = "{$this->baseDir}/src/y{$year}/day{$day}";
 
 			if (!file_exists($dayPath)) {
 				mkdir($dayPath);
@@ -97,8 +97,8 @@ class NewTest extends Command
 			}
 
 			foreach (glob("{$templatePath}/*.php") as $file) {
-				$base     = basename($file);
-				$newPath  = "{$dayPath}/{$base}";
+				$base = basename($file);
+				$newPath = "{$dayPath}/{$base}";
 				if (file_exists($newPath)) {
 					$output->writeln(sprintf('<info>File "%s" exists, skipping...</info>', $base));
 					continue;
@@ -120,7 +120,7 @@ class NewTest extends Command
 			$command->run(
 				new ArrayInput(
 					[
-						'days'   => $days,
+						'days' => $days,
 						'--year' => $year,
 					]
 				),
@@ -135,8 +135,8 @@ class NewTest extends Command
 	{
 		// Create the directories
 		$directories = [
-			'input'    => "{$this->baseDir}/input/{$year}",
-			'year'     => "{$this->baseDir}/src/y{$year}",
+			'input' => "{$this->baseDir}/input/{$year}",
+			'year' => "{$this->baseDir}/src/y{$year}",
 			'template' => "{$this->baseDir}/src/y{$year}/template",
 		];
 
