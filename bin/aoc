@@ -6,6 +6,8 @@ use JPry\AdventOfCode\Command\DownloadInput;
 use JPry\AdventOfCode\Command\CreateDay;
 use JPry\AdventOfCode\Command\Solve;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Dotenv\Dotenv;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
@@ -28,4 +30,10 @@ $app->addCommands(
 	]
 );
 
-$app->run();
+// Set up the output formatter.
+$output = new ConsoleOutput();
+$output
+	->getFormatter()
+	->setStyle('warning', new OutputFormatterStyle('black', 'yellow'));
+
+$app->run(output: $output);
