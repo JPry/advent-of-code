@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace JPry\AdventOfCode\y2024\day02;
 
 use JPry\AdventOfCode\DayPuzzle;
-use ReturnTypeWillChange;
 
 /**
  * Day Solver Class.
@@ -85,8 +84,6 @@ class Solver extends DayPuzzle
 
 			if ($this->is_line_safe($levels)) {
 				$safe++;
-			} else {
-				$this->writeln("Unsafe line: {$line}");
 			}
 		}
 
@@ -154,7 +151,7 @@ class Solver extends DayPuzzle
 	protected function try_level_without_index(array $levels): bool
 	{
 		// Try removing each element one by one to see if any work.
-		for ($i = 0; $i < count($levels) - 1; $i++) {
+		for ($i = 0; $i < count($levels); $i++) {
 			$copy = $levels;
 			unset($copy[$i]);
 			if ($this->is_line_safe($copy)) {

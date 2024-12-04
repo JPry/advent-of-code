@@ -19,13 +19,14 @@ describe('Part 1', function () {
 describe('Part 2', function () {
 	$solve = fn() => new Solver();
 
-	it('should get the correct result for the test input', function ($line) use ($solve) {
+	it('should get the correct result for the test input', function ($line, $result) use ($solve) {
 		$data = array_map('intval', explode(' ', $line));
-		expect($solve()->is_line_safe($data))->toBeTrue();
+		expect($solve()->is_line_safe($data))->toBe($result);
 	})->with('day2');
 
 	it('should get the correct result for the input file', function () use ($solve) {
 		$result = $solve()->returnPart2();
+		printResult($result, __FILE__);
 		expect($result)->toBeGreaterThan(423);
 	});
 });

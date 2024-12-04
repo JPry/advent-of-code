@@ -27,12 +27,7 @@ describe('Part 2', function() {
 	it('should get the correct result for the real input', function() {
 		$solver = new Solver();
 		$result = $solver->returnPart2();
-		printf(
-			'%s Result: %s%s',
-			basename(__FILE__),
-			$result,
-			PHP_EOL
-		);
+		printResult($result, __FILE__);
 		expect($result)->toBeGreaterThan(0);
 	});
 });
