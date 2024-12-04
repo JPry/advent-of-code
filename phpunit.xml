@@ -3,15 +3,18 @@
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.3/phpunit.xsd"
          bootstrap="vendor/autoload.php"
          colors="true"
+         defaultTestSuite="Yearly Tests"
 >
     <testsuites>
-        <testsuite name="Test Suite">
-            <directory suffix="Test.php">./tests</directory>
+        <testsuite name="Yearly Tests">
+            <directory suffix="Test.php">./tests/Year*</directory>
+        </testsuite>
+        <testsuite name="Commands">
+            <directory suffix="Test.php">./tests/Command</directory>
         </testsuite>
     </testsuites>
     <source>
         <include>
-            <directory suffix=".php">./app</directory>
             <directory suffix=".php">./src</directory>
         </include>
     </source>
