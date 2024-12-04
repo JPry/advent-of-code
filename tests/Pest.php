@@ -43,3 +43,20 @@ function something()
 {
     // ..
 }
+
+/**
+ * Print the result of a test.
+ *
+ * @param mixed $result The result to print.
+ * @param string $file The test file from __FILE__.
+ * @return void No return value.
+ */
+function printResult(mixed $result, string $file): void
+{
+	printf(
+		'%s Result: %s%s',
+		basename($file),
+		$result,
+		PHP_EOL
+	);
+}
