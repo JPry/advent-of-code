@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace JPry\AdventOfCode\y2024\day06;
 
 use JPry\AdventOfCode\DayPuzzle;
+use JPry\AdventOfCode\Map;
 
 /**
  * Day Solver Class.
@@ -21,6 +22,7 @@ class Solver extends DayPuzzle
 
 	protected function part1()
 	{
+		return $this->part1Logic($this->getFileAsArray());
 	}
 
 	protected function part2()
@@ -29,6 +31,16 @@ class Solver extends DayPuzzle
 
 	protected function part1Logic($input)
 	{
+		$map = new GuardMap($input);
+		while (true) {
+			try {
+				$map->moveGuard();
+			} catch (\Exception $e) {
+				break;
+			}
+		}
+
+		return $map->sumGuardPositions();
 	}
 
 	protected function part2Logic($input)

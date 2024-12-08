@@ -33,6 +33,15 @@ class Map
 		return $this->map[$point->row][$point->column];
 	}
 
+	public function setValue(Point $point, mixed $value): void
+	{
+		if (!$this->isValidPoint($point)) {
+			throw new RuntimeException(sprintf('Point "%s" is invalid for map.', $point));
+		}
+
+		$this->map[$point->row][$point->column] = $value;
+	}
+
 	protected function validatePoint(Point $point)
 	{
 		if (!$this->isValidPoint($point)) {
