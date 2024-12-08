@@ -1,3 +1,6 @@
 /vendor/
 .env
-input/
+input/**/input.txt
+input/**/part*.txt
+input/**/output*.txt
+input/**/human.txt
