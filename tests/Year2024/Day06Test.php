@@ -20,10 +20,13 @@ describe('Part 1', function() {
 describe('Part 2', function() {
 
 	it('should get the correct result for the test input', function() {
-		
-	})->todo(note: 'Need to write this test');
+		$result = (new Solver())->returnTest2();
+		expect($result)->toBe(6);
+	})->done(note: 'Need to write this test');
 
 	it('should get the correct result for the real input', function() {
-		
-	})->todo(note: 'Need to write this test');
+		$result = (new Solver())->returnPart2();
+		printResult($result, __FILE__);
+		expect($result)->toBeGreaterThan(0)->and->toBeLessThan(5269);
+	})->done(note: 'Need to write this test');
 });
