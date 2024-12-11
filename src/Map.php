@@ -101,4 +101,25 @@ class Map
 			}
 		);
 	}
+
+	/**
+	 * @param Point $point
+	 * @return Point[]
+	 */
+	public function getOrthogonalPointsAround(Point $point): array
+	{
+		$points = [
+			new Point($point->row - 1, $point->column),
+			new Point($point->row, $point->column - 1),
+			new Point($point->row, $point->column + 1),
+			new Point($point->row + 1, $point->column),
+		];
+
+		return array_filter(
+			$points,
+			function (Point $point) {
+				return $this->isValidPoint($point);
+			}
+		);
+	}
 }
