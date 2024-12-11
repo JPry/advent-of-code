@@ -27,6 +27,7 @@ class Solver extends DayPuzzle
 
 	protected function part2()
 	{
+		return $this->part2Logic($this->getFileAsArray());
 	}
 
 	protected function part1Logic($input)
@@ -45,7 +46,21 @@ class Solver extends DayPuzzle
 
 	protected function part2Logic($input)
 	{
+		$map = new GuardMap($input);
+		while (true) {
+			try {
+				$map->moveGuard();
+			} catch (\Exception $e) {
+				break;
+			}
+		}
 
+//		file_put_contents(
+//			$this->input->createFile('output-2-test'),
+//			$map->getMapAsString()
+//		);
+
+		return $map->sumLoopPosition();
 	}
 
 	protected function getNamespace(): string
