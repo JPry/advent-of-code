@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace JPry\AdventOfCode\y2024\day04;
 
 use JPry\AdventOfCode\DayPuzzle;
+use JPry\AdventOfCode\Map;
+use JPry\AdventOfCode\Point;
 
 /**
  * Day Solver Class.
@@ -29,6 +31,21 @@ class Solver extends DayPuzzle
 
 	protected function part1Logic($input)
 	{
+		$rawMap = array_map('str_split', $input);
+		$map = new Map($rawMap);
+		$found = 0;
+		$map->walkMap(function($value, $row, $column, $map) use (&$found) {
+			if ('X' !== $value) {
+				return;
+			}
+
+
+		});
+	}
+
+	protected function checkForNextLetter(string $currentLetter, array $availablePoints)
+	{
+
 	}
 
 	protected function part2Logic($input)
