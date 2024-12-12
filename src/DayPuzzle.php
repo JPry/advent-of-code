@@ -2,8 +2,10 @@
 
 namespace JPry\AdventOfCode;
 
+use AllowDynamicProperties;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[AllowDynamicProperties]
 abstract class DayPuzzle
 {
 	/**
