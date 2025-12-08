@@ -69,7 +69,8 @@ class DownloadInput extends Command
 
 		$errors = 0;
 		foreach ($days as $day) {
-			$inputPath = "{$this->getInputBaseDir()}/{$year}/{$day}/input.txt";
+			$inputDir = "{$this->getInputBaseDir()}/{$year}/{$day}";
+			$inputPath = "{$inputDir}/input.txt";
 
 			// If the file exists and isn't empty, assume it's got the correct content.
 			if (file_exists($inputPath) && strlen(trim(file_get_contents($inputPath))) > 0) {
@@ -81,6 +82,18 @@ class DownloadInput extends Command
 			if ($isCurrentYear && $currentDay < $day) {
 				$output->writeln(sprintf('<info>Day %d of year %s is in the future. Skipping download attempt...</info>', $day, $year));
 				continue;
+			}
+
+			// Ensure the input directory exists.
+			if (!is_dir($inputDir)) {
+				$mkDir = mkdir($inputDir, 0755, true);
+				if (!$mkDir) {
+					$errors++;
+					$output->writeln(sprintf('<error>Could not create input directory: %s</error>', $inputDir));
+					continue;
+				} else {
+					$output->writeln(sprintf('<info>Created input directory: %s</info>', $inputDir));
+				}
 			}
 
 			// Download and save the input data.
