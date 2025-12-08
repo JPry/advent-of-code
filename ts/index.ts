@@ -9,6 +9,13 @@ function getInputForDay(day: number, year: number, test: boolean = false, fileNa
 type DayInput = string;
 type DaySolver = (input: DayInput) => void;
 
+let debugMode: boolean = false;
+function debugLog(message: string): void {
+    if (debugMode) {
+        console.debug(message);
+    }
+}
+
 const daySolvers: { [key: string]: DaySolver } = {
     '01': (input: DayInput) => {
         let zeroCount1: number = 0;
@@ -115,6 +122,7 @@ program
         new Date().getFullYear()
     )
     .option('-t, --test', 'Use test input instead of real input')
+    .option('-d, --debug', 'Enable debug mode')
     .description('Solve the challenge for the specified day')
     .action((day, year, options) => {
         console.debug(`Solving challenge for year ${year} day ${day}...`);
@@ -122,6 +130,8 @@ program
         if (!daySolvers.hasOwnProperty(day)) {
             throw new Error(`No solver implemented for day ${day}`);
         }
+
+        debugMode = options.debug || false;
 
         const input = getInputForDay(day, year, options.test);
         daySolvers[day](input);
