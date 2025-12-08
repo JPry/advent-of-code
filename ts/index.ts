@@ -91,6 +91,97 @@ const daySolvers: { [key: string]: DaySolver } = {
         console.log(`Part 1: Number of times position 0 was reached: ${zeroCount1}`);
         console.log(`Part 2: Number of times position 0 was crossed: ${zeroCount2}`);
     },
+    '02': (input: DayInput) => {
+        const ranges = input.trim().split(',');
+        const invalidNumbers: number[] = [];
+        const part2InvalidNumbers: number[] = [];
+
+        function isNumberInvalid(num: number): boolean {
+            const strNum = num.toString();
+
+            // Odd length numbers can't be invalid based on the criteria.
+            if (strNum.length % 2 === 1) {
+                return false;
+            }
+
+            const start = strNum.slice(0, strNum.length / 2);
+            const end = strNum.slice(strNum.length / 2);
+
+            return start === end;
+        }
+
+        function isNumberInvalidPart2(num: number): boolean {
+            const strNum = num.toString();
+            const strNumLength = strNum.length;
+            let isInvalid = false;
+
+            // The maximum split point is half the length of the number.
+            const maxSplitPoint = Math.floor(strNumLength / 2);
+            const splitPoints = new Set<number>(
+                Array.from(
+                    {length: maxSplitPoint},
+                    (_, i) => i + 1
+                )
+            );
+
+            // console.log(`Checking number: ${num} with split points: ${Array.from(splitPoints).join(', ')}`);
+
+            splitPoints.forEach((splitLength) => {
+                // If we already found the number to be invalid, skip further checks.
+                if (isInvalid) {
+                    return;
+                }
+
+                // If the split point doesn't divide the number evenly, skip it.
+                if (strNumLength % splitLength !== 0) {
+                    return;
+                }
+
+                const numPieces: number = strNumLength / splitLength;
+
+                // Split the number into pieces of the current split length.
+                const pieces: string[] = [];
+
+                /*
+                 * We need to slice the string into pieces of 'splitLength' size.
+                 * For example, if strNum is "121212" and splitLength is 2,
+                 * we want to get ["12", "12", "12"].
+                 */
+                for (let i = 0; i < numPieces; i++) {
+                    const start = i * splitLength;
+                    const end = start + splitLength;
+                    pieces.push(strNum.slice(start, end));
+                }
+
+                debugLog(`Number ${num} split into pieces of length ${splitLength}: ${pieces.join(', ')}`);
+                isInvalid = pieces.every((piece) => piece == pieces[0]);
+                if (isInvalid) {
+                    debugLog(`Number ${num} is invalid with split length ${splitLength} (pieces: ${pieces.join(', ')})`);
+                    return;
+                }
+            });
+
+            return isInvalid;
+        }
+
+        ranges.forEach((range) => {
+            const [start, end] = range.split('-').map(Number);
+            for (let i = start; i <= end; i++) {
+                if (isNumberInvalid(i)) {
+                    invalidNumbers.push(i);
+                }
+
+                if (isNumberInvalidPart2(i)) {
+                    part2InvalidNumbers.push(i);
+                }
+            }
+        });
+
+        debugLog(`Part 2 invalid numbers: ${part2InvalidNumbers.join(', ')}`);
+
+        console.log(`Part 1: Sum of invalid numbers: ${invalidNumbers.reduce((a, b) => a + b, 0)}`);
+        console.log(`Part 2: Sum of invalid numbers (advanced criteria): ${part2InvalidNumbers.reduce((a, b) => a + b, 0)}`);
+    },
 };
 
 // Set up the CLI program.
